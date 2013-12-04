@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_showallbusses_key"
+        android:title="@string/showallbusses" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_ampmtimes_key"
+        android:title="@string/ampmtimes" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/pref_db_autoupdate_key"
+        android:title="@string/auto_check4dbupdate" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/pref_db_GRT_key"
+        android:title="@string/use_db_GRT" />
+    
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_db_STT_key"
+        android:title="@string/use_db_STT" />
+    
+    <MultiSelectListPreference
+        android:key="@string/pref_dbs"
+        android:title="@string/use_dbs"
+        android:summary="Databases to select"
+        android:entries="@array/databaselist"
+        android:entryValues="@array/databaselistvalues"
+        android:defaultValue="@array/empty_array" />
+
+</PreferenceScreen>
