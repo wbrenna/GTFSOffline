@@ -69,7 +69,10 @@ public class MainActivity extends FragmentActivity implements
 	ViewPager mViewPager;
 
 	SharedPreferences mPrefs;
-	public final String[] mDBPreferences = {"Grand River Transit", "Saskatoon Transit"};
+	//public final String[] mDBPreferences = {"Grand River Transit", "Saskatoon Transit"};
+	
+	//We store the active (checked) preferences in mDBActive
+	public static String[] mDBActive = null;
 	public static DatabaseHelper dbHelper = null;
 	public static String[] mDBList = null;
 	
@@ -239,11 +242,20 @@ public class MainActivity extends FragmentActivity implements
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
-			Fragment fragment = new DummySectionFragment();
-			Bundle args = new Bundle();
-			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-			fragment.setArguments(args);
-			return fragment;
+			if (position == 0) {
+				Fragment fragment = new DummySectionFragment();
+				Bundle args = new Bundle();
+				args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+				fragment.setArguments(args);
+				return fragment;
+			}
+			else {
+				Fragment fragment = new DBSectionFragment();
+				Bundle args = new Bundle();
+				args.putString(DBSectionFragment.DATABASE, mDBActive[position-1]);
+				fragment.setArguments(args);
+				return fragment;
+			}
 		}
 
 		@Override
@@ -251,12 +263,20 @@ public class MainActivity extends FragmentActivity implements
 			// Sum of all the preference checkboxes = number of pages + 1.
 			//return mDBPreferences.length + 1;
 			
-			return 3;
+			if(mDBActive == null) {
+				return 1;
+			}
+			else {
+				return 1 + mDBActive.length;
+			}
+
+			//return 3;
 		}
 
 		@Override
 		public CharSequence getPageTitle(int position) {
 			Locale l = Locale.getDefault();
+			/**
 			switch (position) {
 			case 0:
 				return getString(R.string.favs).toUpperCase(l);
@@ -266,14 +286,15 @@ public class MainActivity extends FragmentActivity implements
 				return getString(R.string.pref_db_STT_key).toUpperCase(l);
 			}
 			return null;
+			**/
 			
 			//we just use the array of preferences
-			/**if (position == 0) {
+			if (position == 0) {
 				return getString(R.string.favs);
 			}
 			else {
-				return mDBPreferences[position-1];
-			}**/
+				return mDBActive[position-1];
+			}
 		}
 	}
 
@@ -303,5 +324,29 @@ public class MainActivity extends FragmentActivity implements
 			return rootView;
 		}
 	}
+
+	public static class DBSectionFragment extends Fragment {
+		/**
+		 * The fragment argument representing the section number for this
+		 * fragment.
+		 */
+		public static final String DATABASE = "DBPlaceholder";
+
+		public DBSectionFragment() {
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_main_DB,
+					container, false);
+			TextView dummyTextView = (TextView) rootView
+					.findViewById(R.id.section_label);
+			dummyTextView.setText(Integer.toString(getArguments().getString(
+					DATABASE)));
+			return rootView;
+		}
+	}
+
 
 }
