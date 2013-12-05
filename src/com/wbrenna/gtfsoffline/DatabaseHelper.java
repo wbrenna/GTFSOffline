@@ -21,17 +21,16 @@
 package com.wbrenna.gtfsoffline;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 public class DatabaseHelper {
 	private static final String TAG = "DatabaseHelper"; // getClass().getSimpleName();
@@ -53,7 +52,7 @@ public class DatabaseHelper {
 		mContext = context;
 		DB_NAMES = new HashSet<String>();
 		
-		final String DB_OLD_PATH = context.getApplicationInfo().dataDir + "/databases/";
+		final String DB_OLD_PATH = context.getApplicationInfo().dataDir + "/files/";
 
 
 		// check external storage state first!
@@ -61,7 +60,8 @@ public class DatabaseHelper {
 		//NB This shouldn't require EXTERNAL_STORAGE permissions
 		final File f = mContext.getExternalFilesDir(null);
 		if (f != null) {
-			DB_PATH =  f.getParent();
+			//DB_PATH =  f.getParent();
+			DB_PATH = f.getPath();
 		} else {
 			DB_PATH = DB_OLD_PATH;
 		}
@@ -84,6 +84,18 @@ public class DatabaseHelper {
 		
 		for (int i=0; i<dbfiles.length; i++) {
 			String DB_NAME = dbfiles[i].getName();
+			//ensure it's a DB file
+			String fnarray[] = DB_NAME.split("\\.");
+			if( !fnarray[fnarray.length - 1].equals("db") ) {
+				//this wasn't a database file
+				break;
+			}
+			//check to see if it's a database that can be opened
+			SQLiteDatabase test = ReadableDB(DB_NAME,null);
+			if( test == null ) {
+				break;
+			}
+			CloseDB(test);
 			DB_NAMES.add(DB_NAME);
 		
 			// Delete the old database if it exists, and recreate on the sdcard.
@@ -154,6 +166,9 @@ public class DatabaseHelper {
 			} catch (final SQLiteException e) {
 				// bah
 				Log.e(TAG, "Could not read the database...");
+				Toast.makeText(mContext,  "Problem reading a database! Check *.db and restart.", 
+								Toast.LENGTH_LONG).show();
+				return null;
 			}
 		}
 

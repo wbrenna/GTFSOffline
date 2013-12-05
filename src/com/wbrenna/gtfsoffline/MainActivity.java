@@ -159,27 +159,11 @@ public class MainActivity extends FragmentActivity implements
 		}
 		**/
 		
-		//The preference will contain the strings of the activated elements.
 
-		//for (String str: init_preferences) {
-		//	Log.d("Preference is: ", str);
-		//}
-		
 		
 		//eventually add automated downloading of databases...
 		
-		
-		//Set<String> selectionSet = new HashSet<String>();
-		//selectionSet.addAll(Arrays.asList(mDBPreferences));
-		/**
-		MultiSelectListPreference multiSelectPref = new MultiSelectListPreference(this);
-		multiSelectPref.setKey("db_multipref");
-		multiSelectPref.setTitle("Multiple List Pref");
-		multiSelectPref.setEntries(mDBPreferences);
-		multiSelectPref.setEntryValues(mDBPreferences);
-		multiSelectPref.setDefaultValue(selectionSet);
-		mPrefs.addPreference(multiSelectPref);
-		**/
+
 		
 		
 		// Create the adapter that will return a fragment for each of the three
@@ -229,6 +213,7 @@ public class MainActivity extends FragmentActivity implements
 		
 		//this is the list of currently checked databases
 		mDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
+		mSectionsPagerAdapter.notifyDataSetChanged();
 	}
 	
 	@Override
@@ -313,17 +298,17 @@ public class MainActivity extends FragmentActivity implements
 			// Sum of all the preference checkboxes = number of pages + 1.
 			//return mDBPreferences.length + 1;
 			
-			/**
+			
 			if(mDBActive == null) {
 				return 1;
 			}
 			else {
 				return 1 + mDBActive.length;
 			}
-			**/
+			
 		
 		
-			return 1;
+			//return 1;
 		}
 
 		@Override
@@ -389,7 +374,7 @@ public class MainActivity extends FragmentActivity implements
 
 		public DBSectionFragment(String dbName) {
 			myDatabaseName = dbName;
-			mLocationHelper = new LocationHelper(this.getActivity(), myDatabaseName, null);
+			//mLocationHelper = new LocationHelper(this.getActivity(), myDatabaseName, null);
 		}
 
 		@Override
@@ -398,7 +383,7 @@ public class MainActivity extends FragmentActivity implements
 			View rootView = inflater.inflate(R.layout.fragment_main_db,
 					container, false);
 			TextView dummyTextView = (TextView) rootView
-					.findViewById(R.id.section_label);
+					.findViewById(R.id.section_label2);
 			dummyTextView.setText(getArguments().getString(DATABASE));
 			return rootView;
 		}
