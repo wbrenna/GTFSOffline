@@ -22,6 +22,8 @@ package com.wbrenna.gtfsoffline;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -37,7 +39,8 @@ public class DatabaseHelper {
 	private static String DB_PATH = null;
 	//modify this to open all databases
 	//private static String DB_NAME = "GRT.db";
-	private ArrayList<String> DB_NAMES = new ArrayList<String>();
+	//private ArrayList<String> DB_NAMES = new ArrayList<String>();
+	private Set<String> DB_NAMES;
 	private static Context mContext;
 	//private static SQLiteDatabase DB = null;
 
@@ -48,7 +51,8 @@ public class DatabaseHelper {
 	 */
 	public DatabaseHelper(Context context) {
 		mContext = context;
-
+		DB_NAMES = new HashSet<String>();
+		
 		final String DB_OLD_PATH = context.getApplicationInfo().dataDir + "/databases/";
 
 
@@ -74,6 +78,10 @@ public class DatabaseHelper {
 
 		//Set up the list of databases
 		File dbfiles[] = f2.listFiles();
+		if ( dbfiles == null ) {
+			return;
+		}
+		
 		for (int i=0; i<dbfiles.length; i++) {
 			String DB_NAME = dbfiles[i].getName();
 			DB_NAMES.add(DB_NAME);
@@ -110,8 +118,10 @@ public class DatabaseHelper {
 	}
 
 	/* Return list of databases */
-	public String[] GetListofDB() {
-		return DB_NAMES.toArray(new String[DB_NAMES.size()]);
+	//public String[] GetListofDB() {
+		//return DB_NAMES.toArray(new String[DB_NAMES.size()]);
+	public Set<String> GetListofDB() {
+		return DB_NAMES;
 	}
 	
 	/* Force close the DB so we can recreate it */

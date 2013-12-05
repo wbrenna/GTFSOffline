@@ -29,13 +29,15 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f0a0002;
+        public static final int action_settings=0x7f0a0003;
         public static final int pager=0x7f0a0000;
-        public static final int section_label=0x7f0a0001;
+        public static final int section_label=0x7f0a0002;
+        public static final int section_label2=0x7f0a0001;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
-        public static final int fragment_main_dummy=0x7f030001;
+        public static final int fragment_main_db=0x7f030001;
+        public static final int fragment_main_dummy=0x7f030002;
     }
     public static final class menu {
         public static final int main=0x7f090000;
@@ -87,7 +89,7 @@ public final class R {
         public static final int pref_db_GRT_key=0x7f070003;
         public static final int pref_db_STT_key=0x7f070004;
         public static final int pref_db_autoupdate_key=0x7f070032;
-        public static final int pref_dbs=0x7f070005;
+        public static final int pref_dbs=0x7f070007;
         public static final int pref_favstops_key=0x7f070033;
         public static final int pref_showallbusses_key=0x7f070034;
         public static final int pref_uuid_key=0x7f070035;
@@ -106,9 +108,9 @@ public final class R {
         public static final int title_mapstops=0x7f070041;
         public static final int title_rider_alerts=0x7f070042;
         public static final int title_search=0x7f070043;
-        public static final int use_db_GRT=0x7f070007;
-        public static final int use_db_STT=0x7f070008;
-        public static final int use_dbs=0x7f070006;
+        public static final int use_db_GRT=0x7f070005;
+        public static final int use_db_STT=0x7f070006;
+        public static final int use_dbs=0x7f070008;
         public static final int yes=0x7f070044;
     }
     public static final class style {

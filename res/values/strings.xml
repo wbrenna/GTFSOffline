@@ -7,13 +7,14 @@
 
 
     <string name="pref_db_GRT_key">GRT</string>
-    <string name="pref_db_STT_key">STT</string>    
-    <string name="pref_dbs">databases</string>  
-    <string name="use_dbs">Databases to Monitor</string>
-    
-    
+    <string name="pref_db_STT_key">STT</string>
     <string name="use_db_GRT">Grand River Transit Database?</string>
     <string name="use_db_STT">Saskatoon Transit Database?</string>
+    
+    
+    <string name="pref_dbs">databases</string>  
+    <string name="use_dbs">Databases to Monitor</string>
+  
             
     <string name="about">About</string>
     <string name="ampmtimes">Show times as am/pm</string>

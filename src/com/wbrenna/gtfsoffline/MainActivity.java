@@ -19,7 +19,9 @@
 
 package com.wbrenna.gtfsoffline;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -30,6 +32,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.MultiSelectListPreference;
 import android.preference.PreferenceFragment;
@@ -74,7 +77,7 @@ public class MainActivity extends FragmentActivity implements
 	//We store the active (checked) preferences in mDBActive
 	public static String[] mDBActive = null;
 	public static DatabaseHelper dbHelper = null;
-	public static String[] mDBList = null;
+	public static Set<String> mDBList;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -82,8 +85,8 @@ public class MainActivity extends FragmentActivity implements
 		setContentView(R.layout.activity_main);
 
 		//scan for databases
-		dbHelper = new DatabaseHelper(this);
-		mDBList = dbHelper.GetListofDB();
+		//dbHelper = new DatabaseHelper(this);
+		//mDBList = dbHelper.GetListofDB();
 		
 		
 		// Set up the action bar.
@@ -105,7 +108,8 @@ public class MainActivity extends FragmentActivity implements
 		
 		//THIS WORKS!
 		//String test = mPrefs.getString("@string/pref_db_GRT_key", "none");
-		SharedPreferences aSharedPref = this.getSharedPreferences(getString(R.string.pref_db_GRT_key), Context.MODE_PRIVATE);
+		//SharedPreferences aSharedPref = this.getSharedPreferences(getString(R.string.pref_db_GRT_key), Context.MODE_PRIVATE);
+		/**
 		Boolean test = mPrefs.getBoolean(getString(R.string.pref_db_GRT_key), true);
 		if (test) {
 			Toast.makeText(this, "Preference is true", Toast.LENGTH_LONG).show();
@@ -113,16 +117,49 @@ public class MainActivity extends FragmentActivity implements
 		else {
 			Toast.makeText(this, "Preference is false", Toast.LENGTH_LONG).show();
 		}
-	
+	**/
 		
+		Set<String> emptyString = new HashSet<String>();
+		emptyString.clear();
+		
+		Set<String> initial_preferences = mPrefs.getStringSet(getString(R.string.pref_dbs), 
+											emptyString);
+		
+		//this is the list of currently checked databases
+		mDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
+		
+		
+		
+		//now we can unify the preferences with those scanned from the SD card
+		//we'll only scan on startup to keep things running smoothly
+		//mDBList.addAll(initial_preferences);
+		
+		//since sets are exclusive it won't replicate items
+		//now we clear initial_preferences and replace it with mDBList.
+		//Editor mPrefsEditor = mPrefs.edit();
+		
+		//mPrefsEditor.remove(getString(R.string.pref_dbs)).commit();
+		//mPrefsEditor.putStringSet(getString(R.string.pref_dbs), mDBList).commit();
+		
+		
+		/**
 		Set<String> init_preferences = mPrefs.getStringSet(getString(R.string.pref_dbs), null);
 		if (init_preferences == null) {
 			//something went wrong
 		} else {
-			String[] selected = init_preferences.toArray(new String[] {});
+			String[] selected = init_preferences.toArray(new String[] {"test"});
 			Toast.makeText(this, selected[0], Toast.LENGTH_LONG).show();
 		}
 		
+		if( init_preferences.isEmpty()) {
+			Toast.makeText(this, "Init_preferences is empty...", Toast.LENGTH_LONG).show();
+		} else {
+			Toast.makeText(this, "Init_preferences contains this many elements: " + 
+						Integer.toString(init_preferences.size()), Toast.LENGTH_LONG).show();
+		}
+		**/
+		
+		//The preference will contain the strings of the activated elements.
 
 		//for (String str: init_preferences) {
 		//	Log.d("Preference is: ", str);
@@ -179,7 +216,20 @@ public class MainActivity extends FragmentActivity implements
 		
 	}
 
-	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		//we want to refresh the databases list
+		Set<String> emptyString = new HashSet<String>();
+		emptyString.clear();
+		
+		Set<String> initial_preferences = mPrefs.getStringSet(getString(R.string.pref_dbs), 
+											emptyString);
+		
+		//this is the list of currently checked databases
+		mDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
+	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -250,7 +300,7 @@ public class MainActivity extends FragmentActivity implements
 				return fragment;
 			}
 			else {
-				Fragment fragment = new DBSectionFragment();
+				Fragment fragment = new DBSectionFragment(mDBActive[position-1]);
 				Bundle args = new Bundle();
 				args.putString(DBSectionFragment.DATABASE, mDBActive[position-1]);
 				fragment.setArguments(args);
@@ -263,14 +313,17 @@ public class MainActivity extends FragmentActivity implements
 			// Sum of all the preference checkboxes = number of pages + 1.
 			//return mDBPreferences.length + 1;
 			
+			/**
 			if(mDBActive == null) {
 				return 1;
 			}
 			else {
 				return 1 + mDBActive.length;
 			}
-
-			//return 3;
+			**/
+		
+		
+			return 1;
 		}
 
 		@Override
@@ -331,19 +384,22 @@ public class MainActivity extends FragmentActivity implements
 		 * fragment.
 		 */
 		public static final String DATABASE = "DBPlaceholder";
+		public static LocationHelper mLocationHelper;
+		public static String myDatabaseName;
 
-		public DBSectionFragment() {
+		public DBSectionFragment(String dbName) {
+			myDatabaseName = dbName;
+			mLocationHelper = new LocationHelper(this.getActivity(), myDatabaseName, null);
 		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main_DB,
+			View rootView = inflater.inflate(R.layout.fragment_main_db,
 					container, false);
 			TextView dummyTextView = (TextView) rootView
 					.findViewById(R.id.section_label);
-			dummyTextView.setText(Integer.toString(getArguments().getString(
-					DATABASE)));
+			dummyTextView.setText(getArguments().getString(DATABASE));
 			return rootView;
 		}
 	}

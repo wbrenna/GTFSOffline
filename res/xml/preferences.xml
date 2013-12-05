@@ -28,8 +28,6 @@
         android:key="@string/pref_dbs"
         android:title="@string/use_dbs"
         android:summary="Databases to select"
-        android:entries="@array/databaselist"
-        android:entryValues="@array/databaselistvalues"
         android:defaultValue="@array/empty_array" />
 
 </PreferenceScreen>

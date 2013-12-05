@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -52,9 +53,14 @@ public class LocationHelper {
 
 	private LocationManager mLocationManager;
 	private Location mLocation;
-	private timestopdescArrayAdapter mAdapter;
+	//private timestopdescArrayAdapter mAdapter;
 	private ArrayList<String[]> mListDetails;
 
+	private Context mContext;
+	
+	private String myDBName;
+	private SQLiteDatabase myDB;
+	
 	// Need to store some stuff in an array, so we can sort by distance
 	class StopLocn {
 		public float dist, bearing;
@@ -64,22 +70,25 @@ public class LocationHelper {
 
 	static StopLocn[] mStops = null;
 
-	@Override
-	public DatabaseHelper(Context context, String myDBName, SQLiteDatabase myDB) {
+
+	public LocationHelper(Context context, String aDBName, SQLiteDatabase aDB) {
 		mContext = context;
 
+		myDBName = aDBName;
+		myDB = aDB;
+		
 		// Load animations used to show/hide progress bar
-		mTitle = (TextView) findViewById(R.id.listtitle);
+		//mTitle = (TextView) findViewById(R.id.listtitle);
 		mListDetails = new ArrayList<String[]>(NUM_CLOSEST_STOPS);
 
 		//mTitle.setText(R.string.loading_stops);
 
 
 		// Acquire a reference to the system Location Manager
-		mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
-		mAdapter = new timestopdescArrayAdapter(mContext, R.layout.timestopdesc, mListDetails);
-		mContext.setListAdapter(mAdapter);
+		//mAdapter = new timestopdescArrayAdapter(mContext, R.layout.timestopdesc, mListDetails);
+		//mContext.setListAdapter(mAdapter);
 
 		// Get a best guess of current location
 		Location nwlocn = null, gpslocn = null;
@@ -155,6 +164,7 @@ public class LocationHelper {
 	public class ProcessBusStops extends AsyncTask<Void, Integer, Void> {
 		// static final String TAG = "ProcessBusStops";
 
+		
 		@Override
 		protected void onPreExecute() {
 //			mListDetail.startAnimation(mSlideIn);
@@ -172,6 +182,9 @@ public class LocationHelper {
 		protected Void doInBackground(Void... foo) {
 			// Log.v(TAG, "doInBackground()");
 
+			//myDBName = foo[0];
+			//myDB = foo[1];
+			
 			final String qry = "select stop_id as _id, stop_lat, stop_lon, stop_name from stops";
 			int maxcount;
 
@@ -242,7 +255,7 @@ public class LocationHelper {
 
 			//mTitle.setText(R.string.title_activity_closest_stops);
 
-			mAdapter.notifyDataSetChanged();
+			//mAdapter.notifyDataSetChanged();
 		}
 	}
 
