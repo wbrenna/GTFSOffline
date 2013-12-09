@@ -13,16 +13,21 @@
         android:defaultValue="true"
         android:key="@string/pref_db_autoupdate_key"
         android:title="@string/auto_check4dbupdate" />
-
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="@string/pref_db_GRT_key"
-        android:title="@string/use_db_GRT" />
     
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="@string/pref_db_STT_key"
-        android:title="@string/use_db_STT" />
+    <ListPreference
+        android:defaultValue="@string/default_num_buses_per_stop"
+        android:key="@string/pref_num_buses_per_stop"
+        android:entryValues="@array/ClosestBusNumberStrings"
+        android:entries="@array/ClosestBusNumberStrings"
+        android:title="@string/num_buses_per_stop" />
+    
+    <ListPreference
+        android:defaultValue="@string/default_num_closest_stops"
+        android:key="@string/pref_num_closest_stops"
+        android:entryValues="@array/ClosestStopNumberStrings"
+        android:entries="@array/ClosestStopNumberStrings"
+        android:title="@string/num_closest_stops" />
+    
     
     <MultiSelectListPreference
         android:key="@string/pref_dbs"

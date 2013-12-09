@@ -24,18 +24,16 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
 
 public class DatabaseHelper {
 	private static final String TAG = "DatabaseHelper"; // getClass().getSimpleName();
 
-	private static String DB_PATH = null;
+	private String DB_PATH = null;
+	private String DB_OLD_PATH = null;
 	//modify this to open all databases
 	//private static String DB_NAME = "GRT.db";
 	//private ArrayList<String> DB_NAMES = new ArrayList<String>();
@@ -52,7 +50,7 @@ public class DatabaseHelper {
 		mContext = context;
 		DB_NAMES = new HashSet<String>();
 		
-		final String DB_OLD_PATH = context.getApplicationInfo().dataDir + "/files/";
+		DB_OLD_PATH = context.getApplicationInfo().dataDir + "/files/";
 
 
 		// check external storage state first!
@@ -64,6 +62,7 @@ public class DatabaseHelper {
 			DB_PATH = f.getPath();
 		} else {
 			DB_PATH = DB_OLD_PATH;
+			Log.e(TAG,"Cannot get path to ExternalFilesDir.");
 		}
 
 		final File f2 = new File(DB_PATH);
@@ -76,7 +75,11 @@ public class DatabaseHelper {
 			DB_PATH = DB_OLD_PATH;
 		}
 
+	}
+	
+	public void gatherFiles() {
 		//Set up the list of databases
+		final File f2 = new File(DB_PATH);
 		File dbfiles[] = f2.listFiles();
 		if ( dbfiles == null ) {
 			return;
@@ -96,10 +99,11 @@ public class DatabaseHelper {
 				break;
 			}
 			CloseDB(test);
+			test = null;
 			DB_NAMES.add(DB_NAME);
 		
 			// Delete the old database if it exists, and recreate on the sdcard.
-			if (!DB_PATH.equals(DB_OLD_PATH)) {
+			/**if (!DB_PATH.equals(DB_OLD_PATH)) {
 				final File olddb = new File(DB_OLD_PATH + DB_NAME);
 				if (olddb.exists() && !olddb.delete()) {
 					Log.e(TAG, "failed to delete old db...!?");
@@ -115,6 +119,7 @@ public class DatabaseHelper {
 					return;
 				}
 			}
+			**/
 		
 		
 		}
@@ -124,7 +129,7 @@ public class DatabaseHelper {
 	}
 
 	/* Return path to the database. */
-	public static String GetDBPath()
+	public String GetDBPath()
 	{
 		return DB_PATH;
 	}
@@ -137,7 +142,7 @@ public class DatabaseHelper {
 	}
 	
 	/* Force close the DB so we can recreate it */
-	public static void CloseDB(SQLiteDatabase DB)
+	public void CloseDB(SQLiteDatabase DB)
 	{
 		if (DB != null) {
 			DB.close();
@@ -145,9 +150,9 @@ public class DatabaseHelper {
 		}
 	}
 	/* Return a handle for reading the database. */
-	public static SQLiteDatabase ReadableDB(String DB_NAME, SQLiteDatabase DB) {
+	public SQLiteDatabase ReadableDB(String DB_NAME, SQLiteDatabase DB) {
 
-		if (DB == null) {
+		if ( (DB == null) ) {
 			try {
 				DB = SQLiteDatabase.openDatabase(DB_PATH + "/" + DB_NAME, 
 								null, SQLiteDatabase.OPEN_READONLY);
@@ -155,19 +160,13 @@ public class DatabaseHelper {
 				//String[] dbList = getApplicationContext().databaseList();
 				//can then be used to list databases associated with the application
 
-				//see OsmAnd to see if they did something here
-
-				// Stash the version
-				//final Cursor csr = DB.rawQuery("PRAGMA user_version", null);
-				//csr.moveToPosition(0);
-				//DB_VERSION = csr.getInt(0);
-				//csr.close();
+				//TODO: see OsmAnd to see if they did something here
 
 			} catch (final SQLiteException e) {
 				// bah
 				Log.e(TAG, "Could not read the database...");
-				Toast.makeText(mContext,  "Problem reading a database! Check *.db and restart.", 
-								Toast.LENGTH_LONG).show();
+//				Toast.makeText(mContext,  "Problem reading a database! Check *.db and restart.", 
+//								Toast.LENGTH_LONG).show();
 				return null;
 			}
 		}
@@ -176,7 +175,7 @@ public class DatabaseHelper {
 	}
 
 	/* Return version of current DB */
-	public static int GetDBVersion(String DB_NAME, SQLiteDatabase DB) {
+	public int GetDBVersion(String DB_NAME, SQLiteDatabase DB) {
 		if (DB == null) {
 			ReadableDB(DB_NAME, DB);
 		}

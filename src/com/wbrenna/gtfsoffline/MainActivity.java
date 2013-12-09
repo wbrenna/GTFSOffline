@@ -20,41 +20,38 @@
 package com.wbrenna.gtfsoffline;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Locale;
+import java.util.List;
 import java.util.Set;
-import java.util.prefs.Preferences;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
-import android.preference.MultiSelectListPreference;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.NavUtils;
+//import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements
 		ActionBar.TabListener {
+	private static final String TAG = "MainActivity";
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -73,51 +70,30 @@ public class MainActivity extends FragmentActivity implements
 
 	SharedPreferences mPrefs;
 	//public final String[] mDBPreferences = {"Grand River Transit", "Saskatoon Transit"};
+	//LocationManager mLocationManager;
+	LocationHelper mLocationHelper;
 	
 	//We store the active (checked) preferences in mDBActive
 	public static String[] mDBActive = null;
 	public static DatabaseHelper dbHelper = null;
 	public static Set<String> mDBList;
 	
+	public static Location mLocation = null;
+	public static LocationListener locationListener = null;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		//scan for databases
-		//dbHelper = new DatabaseHelper(this);
-		//mDBList = dbHelper.GetListofDB();
-		
-		
+
 		// Set up the action bar.
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		//read in the preferences
-		//PrefsFragment mPrefsFragment = new PrefsFragment();
-		//mPrefs = this.getSharedPreferences("preferences",
-		//										Context.MODE_PRIVATE);
-		//mPrefs = this.getPreferences(Context.MODE_PRIVATE);
-		
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		
-		
-		//listen to these preferences
-		//mPrefs.registerOnSharedPreferenceChangeListener(this);
-		
-		
-		//THIS WORKS!
-		//String test = mPrefs.getString("@string/pref_db_GRT_key", "none");
-		//SharedPreferences aSharedPref = this.getSharedPreferences(getString(R.string.pref_db_GRT_key), Context.MODE_PRIVATE);
-		/**
-		Boolean test = mPrefs.getBoolean(getString(R.string.pref_db_GRT_key), true);
-		if (test) {
-			Toast.makeText(this, "Preference is true", Toast.LENGTH_LONG).show();
-		}
-		else {
-			Toast.makeText(this, "Preference is false", Toast.LENGTH_LONG).show();
-		}
-	**/
 		
 		Set<String> emptyString = new HashSet<String>();
 		emptyString.clear();
@@ -126,44 +102,63 @@ public class MainActivity extends FragmentActivity implements
 											emptyString);
 		
 		//this is the list of currently checked databases
-		mDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
-		
-		
-		
-		//now we can unify the preferences with those scanned from the SD card
-		//we'll only scan on startup to keep things running smoothly
-		//mDBList.addAll(initial_preferences);
-		
-		//since sets are exclusive it won't replicate items
-		//now we clear initial_preferences and replace it with mDBList.
-		//Editor mPrefsEditor = mPrefs.edit();
-		
-		//mPrefsEditor.remove(getString(R.string.pref_dbs)).commit();
-		//mPrefsEditor.putStringSet(getString(R.string.pref_dbs), mDBList).commit();
-		
-		
-		/**
-		Set<String> init_preferences = mPrefs.getStringSet(getString(R.string.pref_dbs), null);
-		if (init_preferences == null) {
-			//something went wrong
-		} else {
-			String[] selected = init_preferences.toArray(new String[] {"test"});
-			Toast.makeText(this, selected[0], Toast.LENGTH_LONG).show();
-		}
-		
-		if( init_preferences.isEmpty()) {
-			Toast.makeText(this, "Init_preferences is empty...", Toast.LENGTH_LONG).show();
-		} else {
-			Toast.makeText(this, "Init_preferences contains this many elements: " + 
-						Integer.toString(init_preferences.size()), Toast.LENGTH_LONG).show();
-		}
-		**/
-		
+		String[] tmpDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
 
+		//we have to be careful to exclude databases that aren't in our directory
+		dbHelper = new DatabaseHelper(this);
+		dbHelper.gatherFiles();
+		mDBList = dbHelper.GetListofDB();
+		List<String> workingDBList = new ArrayList<String>();
+		
+		for (int i=0; i < tmpDBActive.length; i++) {
+			if ( mDBList.contains(tmpDBActive[i]) )
+			{
+				workingDBList.add(tmpDBActive[i]);
+			}
+		}
+		if (workingDBList.size() == 0)
+		{
+			mDBActive = null;
+		} else {
+			mDBActive = workingDBList.toArray(new String[workingDBList.size()]);
+		}
+		
+		
+		//Set up the location management
+		mLocationHelper = new LocationHelper(this);
+		mLocation = mLocationHelper.startLocationManager();
+		
+		// Define a listener that responds to location updates
+		locationListener = new LocationListener() {
+			@Override
+			public void onLocationChanged(Location location) {
+				if (mLocationHelper.isBetterLocation(location, mLocation)) {
+					mLocation = location;
+					if (mLocation != null) {
+						//new ProcessBusStops().execute();
+						mSectionsPagerAdapter.notifyDataSetChanged();
+						
+					} else {
+						Toast.makeText(getBaseContext(), R.string.last_location_fix, Toast.LENGTH_LONG).show();
+						//Log.e(TAG, "No more location fixes ");
+					}
+				}
+			}
+
+			@Override
+			public void onStatusChanged(String provider, int status, Bundle extras) {
+			}
+
+			@Override
+			public void onProviderEnabled(String provider) {
+			}
+
+			@Override
+			public void onProviderDisabled(String provider) {
+			}
+		};
 		
 		//eventually add automated downloading of databases...
-		
-
 		
 		
 		// Create the adapter that will return a fragment for each of the three
@@ -175,9 +170,6 @@ public class MainActivity extends FragmentActivity implements
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
-		// When swiping between different sections, select the corresponding
-		// tab. We can also use ActionBar.Tab#select() to do this if we have
-		// a reference to the Tab.
 		mViewPager
 				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 					@Override
@@ -188,10 +180,6 @@ public class MainActivity extends FragmentActivity implements
 
 		// For each of the sections in the app, add a tab to the action bar.
 		for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-			// Create a tab with text corresponding to the page title defined by
-			// the adapter. Also specify this Activity object, which implements
-			// the TabListener interface, as the callback (listener) for when
-			// this tab is selected.
 			actionBar.addTab(actionBar.newTab()
 					.setText(mSectionsPagerAdapter.getPageTitle(i))
 					.setTabListener(this));
@@ -212,8 +200,65 @@ public class MainActivity extends FragmentActivity implements
 											emptyString);
 		
 		//this is the list of currently checked databases
-		mDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
+		mDBActive = null;
+		//just to nullify the previous one.
+		if (initial_preferences.size() == 0) {
+			//mDBActive = null;
+			//already null
+		} else {
+			String[] tmpDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
+			dbHelper.gatherFiles();
+			mDBList = dbHelper.GetListofDB();
+			List<String> workingDBList = new ArrayList<String>();
+			
+			for (int i=0; i < tmpDBActive.length; i++) {
+				if ( mDBList.contains(tmpDBActive[i]) )
+				{
+					workingDBList.add(tmpDBActive[i]);
+				}
+			}
+			if (workingDBList.size() == 0)
+			{
+				mDBActive = null;
+			} else {
+				mDBActive = workingDBList.toArray(new String[workingDBList.size()]);
+			}
+		}
+
+		
 		mSectionsPagerAdapter.notifyDataSetChanged();
+		
+		//and create the appropriate tabs
+		final ActionBar actionBar = getActionBar();
+		if ( actionBar.getTabCount() < mSectionsPagerAdapter.getCount() ) {
+			actionBar.removeAllTabs();
+			for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
+				actionBar.addTab(actionBar.newTab()
+						.setText(mSectionsPagerAdapter.getPageTitle(i))
+						.setTabListener(this));
+			}
+		}
+		else if (actionBar.getTabCount() > mSectionsPagerAdapter.getCount()) {
+			actionBar.removeAllTabs();
+			for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
+				actionBar.addTab(actionBar.newTab()
+						.setText(mSectionsPagerAdapter.getPageTitle(i))
+						.setTabListener(this));
+			}
+		}
+		//restart location manager
+		//mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		mLocationHelper.refresh(locationListener);
+		
+		
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		
+		//kill the location manager
+		mLocationHelper.unlinkLocation(locationListener);
 	}
 	
 	@Override
@@ -255,6 +300,8 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onTabUnselected(ActionBar.Tab tab,
 			FragmentTransaction fragmentTransaction) {
+		//we want to turn off location management
+		//mSectionsPagerAdapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -285,47 +332,59 @@ public class MainActivity extends FragmentActivity implements
 				return fragment;
 			}
 			else {
-				Fragment fragment = new DBSectionFragment(mDBActive[position-1]);
+				Fragment fragment = new DBListFragment(mDBActive[position-1]);
 				Bundle args = new Bundle();
-				args.putString(DBSectionFragment.DATABASE, mDBActive[position-1]);
+				args.putString(DBListFragment.DATABASE, mDBActive[position-1]);
 				fragment.setArguments(args);
 				return fragment;
 			}
 		}
 
 		@Override
+		public int getItemPosition(Object object) {
+			//this is called on notifyDataSetChanged, which we use on tab swipe
+			//Fragment f = (Fragment) object;
+		//	if (f instanceof DBListFragment) {
+				//((DBListFragment) f).updatePositions();
+				//Log.e(TAG,"Updating positions");
+		//	}
+			/**
+			Fragment f = (Fragment) object;
+			if (f instanceof DBListFragment) {
+				if (super.getItemPosition(f) == mViewPager.getCurrentItem()) {
+					((DBListFragment) f).relinkPosition();
+					Log.e(TAG, "Relinking from Main");
+				}
+				else {
+					((DBListFragment) f).unlinkPosition();
+					Log.e(TAG, "Unlinking from Main");
+				}
+					
+			}
+			**/
+			
+			//Instead let's just force a view refresh
+			//return super.getItemPosition(object);
+			Log.e(TAG,"Updating positions");
+			return POSITION_NONE;
+		}
+		
+		@Override
 		public int getCount() {
-			// Sum of all the preference checkboxes = number of pages + 1.
-			//return mDBPreferences.length + 1;
-			
-			
+			// Sum of all the preference checkboxes = number of pages + 1
 			if(mDBActive == null) {
+				return 1;
+			} else if (mDBActive[0].equals("")) {
 				return 1;
 			}
 			else {
 				return 1 + mDBActive.length;
 			}
-			
-		
-		
-			//return 1;
 		}
 
 		@Override
 		public CharSequence getPageTitle(int position) {
-			Locale l = Locale.getDefault();
-			/**
-			switch (position) {
-			case 0:
-				return getString(R.string.favs).toUpperCase(l);
-			case 1:
-				return getString(R.string.pref_db_GRT_key).toUpperCase(l);
-			case 2:
-				return getString(R.string.pref_db_STT_key).toUpperCase(l);
-			}
-			return null;
-			**/
-			
+			//Locale l = Locale.getDefault();
 			//we just use the array of preferences
 			if (position == 0) {
 				return getString(R.string.favs);
@@ -355,39 +414,65 @@ public class MainActivity extends FragmentActivity implements
 				Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_main_dummy,
 					container, false);
+			
 			TextView dummyTextView = (TextView) rootView
 					.findViewById(R.id.section_label);
 			dummyTextView.setText(Integer.toString(getArguments().getInt(
 					ARG_SECTION_NUMBER)));
+			
+			//Intent intent = new Intent(this.getActivity(), FavstopsActivity.class);
+			//this.getActivity().startActivity(intent);
+			
 			return rootView;
 		}
 	}
 
-	public static class DBSectionFragment extends Fragment {
+	public static class DBListFragment extends ListFragment {
 		/**
 		 * The fragment argument representing the section number for this
 		 * fragment.
 		 */
-		public static final String DATABASE = "DBPlaceholder";
-		public static LocationHelper mLocationHelper;
-		public static String myDatabaseName;
+		private static final String DATABASE = "DBPlaceholder";
+		private LocationFragmentHelper mLocationFragHelper;
+		private String myDatabaseName;
+		private timestopdescArrayAdapter mListAdapter;
 
-		public DBSectionFragment(String dbName) {
+		private DBListFragment(String dbName) {
 			myDatabaseName = dbName;
-			//mLocationHelper = new LocationHelper(this.getActivity(), myDatabaseName, null);
+			//mLocationManager = aLocationManager;
 		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main_db,
-					container, false);
-			TextView dummyTextView = (TextView) rootView
-					.findViewById(R.id.section_label2);
-			dummyTextView.setText(getArguments().getString(DATABASE));
-			return rootView;
-		}
-	}
 
+			return inflater.inflate(R.layout.fragment_main_db, container, false);
+		}
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			
+			mLocationFragHelper = new LocationFragmentHelper(this.getActivity(), myDatabaseName, null);
+			//setup the list adapter
+			mLocationFragHelper.runProcessOnLocation(mLocation);
+			mListAdapter = new timestopdescArrayAdapter(this.getActivity(), R.layout.timestopdesc, 
+							mLocationFragHelper.retrieveNextBusList());
+			
+			setListAdapter(mListAdapter);
+			mLocationFragHelper.addTimeAdapter(mListAdapter);
+
+		}
+		
+		public void onListItemClick(ListView lv, View v, int position, long id) {
+			//do something
+		}
+		
+		public void updatePositions() {
+			mLocationFragHelper.runProcessOnLocation(mLocation);
+		}
+		
+	}
+	
 
 }

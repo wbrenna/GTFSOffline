@@ -5,17 +5,16 @@
     <string name="action_settings">Settings</string>
     <string name="favs">Favourites</string>
 
-
-    <string name="pref_db_GRT_key">GRT</string>
-    <string name="pref_db_STT_key">STT</string>
-    <string name="use_db_GRT">Grand River Transit Database?</string>
-    <string name="use_db_STT">Saskatoon Transit Database?</string>
-    
-    
     <string name="pref_dbs">databases</string>  
     <string name="use_dbs">Databases to Monitor</string>
   
-            
+    <string name="pref_num_closest_stops">numcloseststops</string>
+    <string name="num_closest_stops">Number of Closest Stops to Return</string>
+    <string name="pref_num_buses_per_stop">numbusesperstop</string>
+    <string name="num_buses_per_stop">Number of Buses per Stop to List</string>
+	<string name="default_num_closest_stops">8</string>
+    <string name="default_num_buses_per_stop">3</string>
+	
     <string name="about">About</string>
     <string name="ampmtimes">Show times as am/pm</string>
     <string name="app_description"></string>

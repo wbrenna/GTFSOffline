@@ -58,6 +58,7 @@ public class PrefsActivity extends PreferenceActivity {
                     
             		//dynamically populate this with the databases available
             		final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+            		dbHelper.gatherFiles();
             		final Set<String> mDBList = dbHelper.GetListofDB();
             		MultiSelectListPreference myMultPref = (MultiSelectListPreference) findPreference(getString(R.string.pref_dbs));
             		if (myMultPref != null) {

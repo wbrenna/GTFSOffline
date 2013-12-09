@@ -1,3 +1,22 @@
+<!--
+ * Copyright 2011 Giles Malet.
+ *	Edited 2013 Wilson Brenna.
+ *
+ * This file is part of GTFSOffline.
+ * 
+ * GTFSOffline is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * GTFSOffline is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with GTFSOffline.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <resources>
 
     <!--
@@ -17,4 +36,107 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    
+    <style name="Text" parent="@android:style/TextAppearance" />
+    
+    <style name="List" parent="Text">
+        <item name="android:textColor">@android:color/primary_text_light</item>
+        <item name="android:background">@color/list_dark_background</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:paddingRight">5dip</item>
+    </style>
+
+    <style name="List.Title" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@android:color/primary_text_light</item>
+        <item name="android:background">@color/list_dark_background</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingLeft">3dip</item>
+    </style>
+
+    <style name="List.Label">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="List.Body">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:divider">@color/grt_blue</item>
+        <item name="android:dividerHeight">3dip</item>
+        <item name="android:footerDividersEnabled">false</item>
+        <item name="android:headerDividersEnabled">true</item>
+    </style>
+
+    <style name="List.Content">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">60dip</item>
+        <item name="android:scrollHorizontally">false</item>
+    </style>
+    
+    <style name="List.Cont1" parent="List.Content">
+         <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingRight">1dip</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+    
+    <style name="List.Cont2" parent="List.Content">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:paddingRight">1dip</item>
+    </style>
+
+    <style name="List.Rightlabel">
+        <item name="android:gravity">right</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingRight">5dip</item>
+        <item name="android:textColor">@color/timer</item>
+    </style>
+
+    <style name="List.Stoptime">
+        <item name="android:layout_width">76sp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:paddingRight">3dip</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="List.Stopbusname">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:scrollHorizontally">true</item>
+    </style>
+
+    <style name="List.RouteandStoplabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:minWidth">42sp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="List.Stoplabel" parent="List.RouteandStoplabel">
+        <item name="android:textColor">@color/grt_blue</item>
+        <item name="android:background">@drawable/stopnumber</item>
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:paddingRight">3dip</item>
+    </style>
+
+    <style name="List.Routelabel" parent="List.RouteandStoplabel">
+        <item name="android:textColor">@color/grt_yellow</item>
+        <item name="android:background">@drawable/routenumber</item>
+    </style>
+    
+    
 </resources>
