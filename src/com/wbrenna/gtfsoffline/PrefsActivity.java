@@ -47,6 +47,17 @@ public class PrefsActivity extends PreferenceActivity {
 		super.onResume();
 	}
 	
+	/**
+	public static class FavPrefsFragment extends PreferenceFragment {
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			
+			
+		}
+	}
+	**/
+	
     public static class PrefsFragment extends PreferenceFragment {
    	 
         @Override
@@ -77,64 +88,4 @@ public class PrefsActivity extends PreferenceActivity {
         }
         
     }
-	
-	//I don't think this is necessary
-	//static preference loader
-	/**
-    public static class PrefsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
-    	 
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-                    super.onCreate(savedInstanceState);
-
-                    // Load the preferences from an XML resource
-                    addPreferencesFromResource(R.xml.preferences);
-        }
-        
-        
-        //and listener apps
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        	
-        }
-        
-        @Override
-        public void onResume() {
-        	super.onResume();
-        	getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-        }
-        @Override
-        public void onPause() {
-        	super.onPause();
-        	getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-        }
-    }
-    **/
-    
-    
-    //dynamic preference loader take 2
-    /**
-    protected void initializeDatabaseList() {
-    	ListPreference lpPref = (ListPreference)findPreference("dbList");
-    	//read in the database lists
-    	//initially set the default values to false
-    	lpPref.setEntries(entries);
-    	lpPref.setEntryValues(entryValues);
-    }**/
-	
-	//dynamic preference loader
-    /**
-    public static class PrefsDynamicFragment extends PreferenceFragment {
-    	 
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-                    super.onCreate(savedInstanceState);
-
-                    Intent intent = new Intent(getActivity(), DBLoader.class);
-                    addPreferencesFromIntent(intent);
-        }
-    }**/
-	
-	
-	
 }

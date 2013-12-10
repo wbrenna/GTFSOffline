@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/List"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/list_dark_background"
+    android:orientation="horizontal"
+	>
+	
+    <LinearLayout
+    	style="@style/List.Content"
+    	android:layout_width="wrap_content"
+    	android:layout_height="fill_parent"
+    	android:background="@color/list_dark_background"
+    	android:orientation="vertical"
+		>
+
+    		<TextView
+	        	android:id="@+id/stoptime"
+	        	style="@style/List.Stoptime"
+	        	android:gravity="center_horizontal"
+	        	android:visibility="gone" />    
+	        	
+    		<TextView
+	        	android:id="@+id/label"
+	        	style="@style/List.Stoplabel"
+	        	android:gravity="center_horizontal"
+	        />
+    		
+    </LinearLayout>
+    
+	<LinearLayout 
+    	style="@style/List.Content"
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+    	android:background="@color/list_dark_background"
+    	android:orientation="vertical"
+		>
+ 
+	    <TextView
+	        android:id="@+id/value"
+	        style="@style/List.Cont1"
+	        android:gravity="center_horizontal"  />
+	    
+	    <TextView
+	        android:id="@+id/tripheader"
+	        style="@style/List.Cont2" />
+	    
+	    <TextView
+	        android:id="@+id/departsin"
+	        style="@style/List.Rightlabel" />
+	    
+	    <TextView
+	        android:id="@+id/trip_id"
+	        android:visibility="gone"
+	        style="@style/List.Rightlabel" />
+
+    </LinearLayout>
+    
+</LinearLayout>

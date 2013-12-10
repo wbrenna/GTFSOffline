@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+     <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/titlelogo"
+            android:layout_width="44dp"
+            android:layout_height="36dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:onClick="onTitlebarClick" />
+        
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/listtitle"
+        style="@style/List.Title"
+        android:paddingBottom="3dip"
+        android:paddingLeft="3dip"
+        android:text="@string/loading_times" />
+
+    <LinearLayout
+        android:id="@+id/detail_area"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <ListView
+            android:id="@id/android:list"
+            style="@style/List.Body"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+    </LinearLayout>
+
+</LinearLayout>

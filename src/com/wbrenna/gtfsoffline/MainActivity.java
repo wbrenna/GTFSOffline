@@ -45,6 +45,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -325,9 +326,9 @@ public class MainActivity extends FragmentActivity implements
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
 			if (position == 0) {
-				Fragment fragment = new DummySectionFragment();
+				Fragment fragment = new FavSectionFragment();
 				Bundle args = new Bundle();
-				args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+				args.putInt(FavSectionFragment.ARG_SECTION_NUMBER, position + 1);
 				fragment.setArguments(args);
 				return fragment;
 			}
@@ -375,6 +376,8 @@ public class MainActivity extends FragmentActivity implements
 			if(mDBActive == null) {
 				return 1;
 			} else if (mDBActive[0].equals("")) {
+				//this shouldn't happen
+				mDBActive = null;
 				return 1;
 			}
 			else {
@@ -399,32 +402,53 @@ public class MainActivity extends FragmentActivity implements
 	 * A dummy fragment representing a section of the app, but that simply
 	 * displays dummy text.
 	 */
-	public static class DummySectionFragment extends Fragment {
+	public static class FavSectionFragment extends ListFragment {
 		/**
 		 * The fragment argument representing the section number for this
 		 * fragment.
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
-
-		public DummySectionFragment() {
+		private FavFragmentHelper mFavFragHelper;
+		private String myDatabaseName;
+		private timestopdescArrayAdapter mListAdapter;
+		
+		
+		public FavSectionFragment() {
 		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main_dummy,
+			View rootView = inflater.inflate(R.layout.fragment_main_db,
 					container, false);
-			
-			TextView dummyTextView = (TextView) rootView
-					.findViewById(R.id.section_label);
-			dummyTextView.setText(Integer.toString(getArguments().getInt(
-					ARG_SECTION_NUMBER)));
-			
-			//Intent intent = new Intent(this.getActivity(), FavstopsActivity.class);
-			//this.getActivity().startActivity(intent);
 			
 			return rootView;
 		}
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			
+			mFavFragHelper = new FavFragmentHelper(this.getActivity(), mDBActive);
+			//setup the list adapter
+			mFavFragHelper.runProcessOnLocation(mLocation);
+			mListAdapter = new timestopdescArrayAdapter(this.getActivity(), R.layout.favstopdesc, 
+							mFavFragHelper.retrieveNextBusList());
+			
+			setListAdapter(mListAdapter);
+			mFavFragHelper.addTimeAdapter(mListAdapter);
+			
+			//set up the long click favourites
+			getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+					mFavFragHelper.onListItemLongClick(parent, view, position, id);
+					return true; // we consumed the click
+				}
+			});
+
+		}
+		
 	}
 
 	public static class DBListFragment extends ListFragment {
@@ -447,6 +471,8 @@ public class MainActivity extends FragmentActivity implements
 				Bundle savedInstanceState) {
 
 			return inflater.inflate(R.layout.fragment_main_db, container, false);
+			
+
 		}
 		
 		@Override
@@ -461,11 +487,39 @@ public class MainActivity extends FragmentActivity implements
 			
 			setListAdapter(mListAdapter);
 			mLocationFragHelper.addTimeAdapter(mListAdapter);
+			
+			//set up the long click favourites
+			getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+					mLocationFragHelper.onListItemLongClick(parent, view, position, id);
+					return true; // we consumed the click
+				}
+			});
 
 		}
 		
 		public void onListItemClick(ListView lv, View v, int position, long id) {
-			//do something
+			Log.v(TAG, "clicked position " + position);
+
+			final String[] strs = (String[]) lv.getItemAtPosition(position);
+			if (strs == null) {
+				return;
+			}
+			final String stop_id = strs[1];
+			final String stop_name = strs[2];
+			final String headsign = strs[3];
+			final String trip_id = strs[5];
+			Log.v(TAG, "Found stop with ID,name,etc:" + stop_id + stop_name + trip_id);
+
+			final Intent routes = new Intent(this.getActivity(), TimesActivity.class);
+			final String pkgstr = this.getActivity().getApplicationContext().getPackageName();
+			routes.putExtra(pkgstr + ".stop_id", stop_id);
+			routes.putExtra(pkgstr + ".stop_name", stop_name);
+			routes.putExtra(pkgstr + ".trip_id", trip_id);
+			routes.putExtra(pkgstr + ".headsign", headsign);
+			routes.putExtra(pkgstr + ".db_name", myDatabaseName);
+			this.getActivity().startActivity(routes);
 		}
 		
 		public void updatePositions() {

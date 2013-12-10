@@ -52,11 +52,12 @@ public class timestopdescArrayAdapter extends ArrayAdapter <String[]> /*<ArrayLi
 	}
 
 	static class ViewHolder {
-		TextView stoptime;
-		TextView label;
-		TextView value;
-		TextView tripheader;
-		TextView departsin;
+		TextView stoptime; //this is the distance to the stop (not labeled well!)
+		TextView label;	//this is stop_id
+		TextView value; // this is stop_name
+		TextView tripheader; //this is the trip header
+		TextView departsin; //the time until it departs
+		TextView tripid; //a hidden trip id
 	}
 
 	@Override
@@ -77,6 +78,7 @@ public class timestopdescArrayAdapter extends ArrayAdapter <String[]> /*<ArrayLi
 			holder.value = (TextView) view.findViewById(R.id.value);
 			holder.tripheader = (TextView) view.findViewById(R.id.tripheader);
 			holder.departsin = (TextView) view.findViewById(R.id.departsin);
+			holder.tripid = (TextView) view.findViewById(R.id.trip_id);
 			//
 			view.setTag(holder);
 		} else {
@@ -85,13 +87,14 @@ public class timestopdescArrayAdapter extends ArrayAdapter <String[]> /*<ArrayLi
 		}
 
 		if (mDetails.size() > 0) {
-			if (mDetails.get(0).length > 4)
+			if (mDetails.get(0).length > 5)
 			{
 				holder.stoptime.setText(mDetails.get(position)[0]);
 				holder.label.setText(mDetails.get(position)[1]);
 				holder.value.setText(mDetails.get(position)[2]);
 				holder.tripheader.setText(mDetails.get(position)[3]);
 				holder.departsin.setText(mDetails.get(position)[4]);
+				holder.tripid.setText(mDetails.get(position)[5]);
 			}
 		}
 		

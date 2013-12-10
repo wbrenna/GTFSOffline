@@ -9,10 +9,9 @@
         android:defaultValue="false"
         android:key="@string/pref_ampmtimes_key"
         android:title="@string/ampmtimes" />
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="@string/pref_db_autoupdate_key"
-        android:title="@string/auto_check4dbupdate" />
+    
+    
+    
     
     <ListPreference
         android:defaultValue="@string/default_num_buses_per_stop"

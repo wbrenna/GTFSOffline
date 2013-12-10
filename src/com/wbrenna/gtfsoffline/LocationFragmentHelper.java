@@ -24,18 +24,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.text.format.Time;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Toast;
 
 public class LocationFragmentHelper {
 	
 	private static final String TAG = "LocationFragmentHelper";
+	private static String FAVSTOPS_KEY;
 
 	private static int NUM_CLOSEST_STOPS;
 	private static int NUM_BUSES;	//the number of next buses per stop to be shown.
@@ -77,6 +85,7 @@ public class LocationFragmentHelper {
 		mStops = null;
 		
 		//set up prefs
+		FAVSTOPS_KEY = new String(mContext.getString(R.string.pref_favstops_key));
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		reloadPreferences();
 	}
@@ -192,7 +201,8 @@ public class LocationFragmentHelper {
 				}
 				//So, we have the heading of the nearest stop. Now, we need to query to find
 				//the next NUM_BUSES.
-				ServiceCalendar myBusService = new ServiceCalendar(myDBName, myDB, mDatabaseHelper, ampmflag);
+				ServiceCalendar myBusService = new ServiceCalendar(myDBName, myDB, ampmflag);
+				myBusService.setDB(mDatabaseHelper);
 				final ArrayList<String[]> fullResults = myBusService.getNextDepartureTimes(s.stop_id, NUM_BUSES);
 				//the format of this:
 				// departuretime	runstoday	trip_id		route_short_name	trip_headsign
@@ -222,7 +232,8 @@ public class LocationFragmentHelper {
 									+ " minutes";
 					}
 					
-					mListDetails.add(new String[] { dist, s.stop_id, s.stop_name, str[4], departsIn });
+					mListDetails.add(new String[] { dist, s.stop_id, s.stop_name, 
+										str[4], departsIn ,str[2]});
 				}
 			}
 
@@ -256,4 +267,79 @@ public class LocationFragmentHelper {
 			mDatabaseHelper.CloseDB(myDB);
 		}
 	}
+	
+	// Called for a long click
+	public void onListItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+		Log.v(TAG, "long clicked position " + position);
+
+		final String[] strs = (String[]) parent.getItemAtPosition(position);
+		if (strs == null) {
+			return;
+		}
+		final String stop_id = strs[1];
+		final String stop_name = strs[2];
+
+		final DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				switch (id) {
+				case DialogInterface.BUTTON_POSITIVE:
+					AddBusstopFavourite(stop_id, stop_name);
+					break;
+				}
+				dialog.cancel();
+			}
+		};
+
+		final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setTitle("Stop " + stop_id + ", " + stop_name);
+		builder.setMessage(R.string.favs_add_to_list).setPositiveButton(R.string.yes, listener)
+		.setNegativeButton(R.string.no, listener).create().show();
+	}
+	
+	public ArrayList<String[]> GetBusstopFavourites() {
+		final String favs = mPrefs.getString(FAVSTOPS_KEY, "");
+
+		// Load the array for the list
+		final ArrayList<String[]> details = new ArrayList<String[]>();
+
+		// favs is a semi-colon separated string of stops, with a trailing semi-colon.
+		// Then each stop has a description stored as KEY-stop.
+		if (!favs.equals("")) {
+			final TextUtils.StringSplitter splitter = new TextUtils.SimpleStringSplitter(';');
+			splitter.setString(favs);
+			for (final String s : splitter) {
+				final String[] strs = { s, mPrefs.getString(FAVSTOPS_KEY + "-" + s, "") };
+				details.add(strs);
+			}
+		}
+		return details;
+	}
+
+
+	public void AddBusstopFavourite(String busstop, String stopname) {
+		String favs = mPrefs.getString(FAVSTOPS_KEY, "");
+
+		final TextUtils.StringSplitter splitter = new TextUtils.SimpleStringSplitter(';');
+		splitter.setString(favs);
+		boolean already = false;
+		for (final String s : splitter) {
+			if (s.equals(busstop)) {
+				already = true;
+				break;
+			}
+		}
+
+		if (already) {
+			Toast.makeText(mContext, "Stop " + busstop + " is already a favourite!", Toast.LENGTH_LONG).show();
+			;
+		} else {
+			favs += busstop + ";";
+			mPrefs.edit().putString(FAVSTOPS_KEY, favs).putString(FAVSTOPS_KEY + "-" + busstop, stopname).commit();
+			Toast.makeText(mContext, "Stop " + busstop + " was added to your favourites.", Toast.LENGTH_LONG).show();
+			;
+		}
+	}
+	
+	
 }

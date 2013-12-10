@@ -25,6 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.wbrenna.gtfsoffline.TimesActivity"
+            android:label="@string/favs" >
+        </activity>
         <activity 
             android:label="@string/preferences" 
             android:theme="@style/AppTheme" 

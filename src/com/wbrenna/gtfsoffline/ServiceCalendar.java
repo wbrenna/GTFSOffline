@@ -51,7 +51,7 @@ public class ServiceCalendar {
 	private DatabaseHelper mDatabaseHelper;
 	private boolean ampm;
 	
-	public ServiceCalendar(String aDBName, SQLiteDatabase aDB, DatabaseHelper aDatabaseHelper, boolean ampmflag) {
+	public ServiceCalendar(String aDBName, SQLiteDatabase aDB, boolean ampmflag) {
 		// Log.v(TAG, "ServiceCalendar()");
 		mDB = aDB;
 		mDBName = aDBName;
@@ -60,11 +60,14 @@ public class ServiceCalendar {
 		falsemap = new HashMap<String, String>(32);
 		trip2servicemap = new HashMap<String, String>(64);
 		
-		mDatabaseHelper = aDatabaseHelper;
+		//mDatabaseHelper = aDatabaseHelper;
 		ampm = ampmflag;
 
 	}
 
+	public void setDB(DatabaseHelper aDatabaseHelper) {
+		mDatabaseHelper = aDatabaseHelper;
+	}
 	// Return string showing days this bus runs.
 	// Cursor points to a row in the calendar table for this service_id.
 	private static String getDays(Cursor csr) {
@@ -345,11 +348,74 @@ public class ServiceCalendar {
 			return null;
 		}
 	}
+	/* Return a list of times that all busses for all routes depart a given stop, sorted by time. List is departure_time,
+	 * route_id, trip_headsign. */
+	public ArrayList<String[]> getRouteDepartureTimes(String stopid, String date, 
+				boolean dontlimittotoday, SQLiteDatabase aDB) {
 
+		final String q = "select distinct departure_time as _id, trips.trip_id, routes.route_short_name, trip_headsign from stop_times "
+				+ "join trips on stop_times.trip_id = trips.trip_id " + "join routes on routes.route_id = trips.route_id  "
+				+ "where stop_id = ? order by departure_time";
+
+		final String[] selectargs = new String[] { stopid };
+		final Cursor csr = aDB.rawQuery(q, selectargs);
+
+		// Load the array for the list
+		final int maxcount = csr.getCount();
+		final ArrayList<String[]> listdetails = new ArrayList<String[]>(maxcount);
+
+		boolean more = csr.moveToFirst();
+		while (more) {
+
+			final String trip_id = csr.getString(1);
+			final String daysstr = getTripDaysofWeek(trip_id, date, !dontlimittotoday);
+
+			// Only add if the bus runs on this day.
+			if (daysstr != null) {
+				listdetails.add(new String[] { csr.getString(0), daysstr, csr.getString(2), csr.getString(3) });
+			}
+
+			more = csr.moveToNext();
+		}
+		csr.close();
+
+		return listdetails;
+	}
+	public ArrayList<String[]> getRouteDepartureTimes(String stopid, String routeid, String headsign, String date,
+			boolean limittotoday, SQLiteDatabase aDB) {
+
+		final String q = "select distinct departure_time as _id, trip_id from stop_times where stop_id = ? and trip_id in "
+				+ "(select trip_id from trips where route_id = ? and trip_headsign = ?) order by departure_time";
+		final String[] selectargs = new String[] { stopid, routeid, headsign };
+		final Cursor csr = aDB.rawQuery(q, selectargs);
+
+		// Load the array for the list
+		final int maxcount = csr.getCount();
+		final ArrayList<String[]> listdetails = new ArrayList<String[]>(maxcount);
+
+		boolean more = csr.moveToFirst();
+		while (more) {
+
+			final String trip_id = csr.getString(1);
+			final String daysstr = getTripDaysofWeek(trip_id, date, limittotoday);
+
+			// Only add if the bus runs on this day.
+			if (daysstr != null) {
+				listdetails.add(new String[] { csr.getString(0), daysstr, csr.getString(1) });
+			}
+
+			more = csr.moveToNext();
+		}
+		csr.close();
+
+		return listdetails;
+	}
+
+	
 	/* Return a properly formatted time. Assumes nn:nn[:nn] input somewhere in the string, may return just that, or convert and
 	 * add annoying American `am/pm' suffix. */
 	/* **** Using hhmmss input - no colons, always seconds! */
-	public String formattedTime(String time) {
+	public static String formattedTime(String time, boolean inampm) {
 		//final int i = time.indexOf(':'); // Take note of where first colon is
 		//final int j = time.lastIndexOf(':'); // and the last.
 
@@ -380,26 +446,11 @@ public class ServiceCalendar {
 			seconds = time.substring(4,6) + "s";
 		}
 
-		/*
-		if (i < 0) {
-			return time; // strange?
-		}
-
-		String newtime;
-
-		// If the string contains seconds, which are always zero, truncate them.
-		if (j == i + 3 && time.substring(j, j + 3).contentEquals(":00")) {
-			newtime = time.substring(0, j) + time.substring(j + 3);
-		} else {
-			newtime = time;
-		}
-		*/
-
 		String newtime = hours + minutes + seconds;
 
 		int inthours;
 		try {
-			inthours = Integer.parseInt(hours);
+			inthours = Integer.parseInt(time.substring(0,2));
 		} catch (final NumberFormatException e) {
 			Log.d(TAG, "NumberFormatException: " + e.getMessage() + ", for time `" + newtime + "'");
 			return newtime;
@@ -417,7 +468,7 @@ public class ServiceCalendar {
 			return newtime;
 		}
 
-		if (!ampm) {
+		if (!inampm) {
 			newtime = hours + minutes + seconds;
 			//return newtime.replaceFirst(":", "h");
 			return newtime;
