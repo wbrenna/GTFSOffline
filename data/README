@@ -1,0 +1,7 @@
+Unzip a GTFS-compatible zip file into this directory. Then, run the script as so:
+./mksql3db.sh DBName.db theGTFSFolder/*.txt
+
+The scripts will produce a database called DBName.db as well as some versioning files.
+Transfer the DBName.db file to the /sdcard/Android/data/com.wbrenna.gtfsoffline/files/
+folder of the Android device. GTFSOffline will take it from there! Activate the database
+in the Settings menu.
