@@ -239,6 +239,8 @@ public class ServiceCalendar {
 			final String daysstr = this.getTripDaysofWeek(trip_id, date, true);
 
 			// Only add if the bus runs on this day.
+			// the format here:
+			// departure_time	daystorun	trip_id
 			if (daysstr != null) {
 				listdetails.add(new String[] { csr.getString(1), daysstr, trip_id });
 			}
@@ -261,14 +263,14 @@ public class ServiceCalendar {
 			for (int i = 0; i < Math.min(maxResults,listdetails.size()); i++ ) {
 
 				final String q2 = "select route_long_name, route_short_name, trip_headsign from routes " +
-						"join trips on trip_id = ?";
-				final String[] selectargs2 = new String[] { listdetails.get(i)[2] };
+						"join trips on routes.route_id = trips.route_id where trip_id = ?";
+				final String[] selectargs2 = new String[] { listdetails.get(i)[2], listdetails.get(i)[0] };
 				final Cursor csr2 = mDB.rawQuery(q2, selectargs2);
 				csr2.moveToFirst();
 				//this should have only one element (trip_id is unique!)
 				//the format of this:
 				// departuretime	runstoday	trip_id		route_short_name	trip_headsign
-				//	140300				1		34867		13					Route 13 Laurelwood
+				//	140300		1		34867		13			Route 13 Laurelwood
 				
 				//Some routes use only long_name, some use short_name. Also trip_headsign doesn't always exist.
 				if (csr2.getString(2).equals(""))
