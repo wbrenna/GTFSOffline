@@ -193,6 +193,8 @@ public class FavFragmentHelper {
 						mListDetails.add(new String[] { "", s.stop_id, s.stop_name, str[4], departsIn, str[2] });
 					}
 				}
+				//close the database
+				mDatabaseHelper.CloseDB(myDB);
 			}
 			return null;
 		}
@@ -210,8 +212,6 @@ public class FavFragmentHelper {
 			} else {
 				mAdapter.notifyDataSetChanged();
 			}
-			//close the database
-			//mDatabaseHelper.CloseDB(myDB);
 		}
 	}
 	

@@ -179,7 +179,10 @@ public class DatabaseHelper {
 		if (DB == null) {
 			ReadableDB(DB_NAME, DB);
 		}
-		return DB.rawQuery("PRAGMA user_version", null).getInt(0);
+		int dQuery = DB.rawQuery("PRAGMA user_version", null).getInt(0);
+
+		CloseDB(DB);
+		return dQuery;
 	}
 	
 	

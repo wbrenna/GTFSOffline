@@ -84,7 +84,6 @@ public class TimesActivity extends ListActivity {
 		ampmflag = mPrefs.getBoolean(mContext.getString(R.string.pref_ampmtimes_key), false);
 
 		DatabaseHelper DBHelper = new DatabaseHelper(this);
-		mDB = DBHelper.ReadableDB(mDBName, null);
 		
 		getActionBar().setTitle(R.string.routestitle);
 
@@ -128,6 +127,9 @@ public class TimesActivity extends ListActivity {
 			// Log.v(TAG, "onPreExecute()");
 			//mListDetail.startAnimation(mSlideIn);
 			//mProgress.setVisibility(View.VISIBLE);
+			
+			//Set up the database
+			mDB = DBHelper.ReadableDB(mDBName, null);
 		}
 
 		// Update the progress bar.
@@ -278,6 +280,9 @@ public class TimesActivity extends ListActivity {
 
 			msg.setGravity(Gravity.TOP, 0, 0);
 			msg.show();
+
+			//Close the database
+			DBHelper.CloseDB(mDB);
 		}
 	}
 
