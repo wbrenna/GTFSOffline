@@ -21,6 +21,7 @@ package com.wbrenna.gtfsoffline;
 
 import java.util.ArrayList;
 
+
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
@@ -72,6 +73,8 @@ public class TimesActivity extends ListActivity {
 		mHeadsign = intent.getStringExtra(pkgstr + ".headsign");
 		mStop_id = intent.getStringExtra(pkgstr + ".stop_id");
 		mDBName = intent.getStringExtra(pkgstr + ".db_name");
+		mTitle = (TextView) findViewById(R.id.listtitle);
+
 		
 		Log.e(TAG,"List of data: " + mTrip_id + mHeadsign + mStop_id + mDBName);
 		//Set up shared preferences and get the database key.
@@ -82,6 +85,8 @@ public class TimesActivity extends ListActivity {
 
 		DatabaseHelper DBHelper = new DatabaseHelper(this);
 		mDB = DBHelper.ReadableDB(mDBName, null);
+		
+		getActionBar().setTitle(R.string.routestitle);
 
 	}
 
@@ -213,30 +218,31 @@ public class TimesActivity extends ListActivity {
 			//mProgress.setVisibility(View.INVISIBLE);
 			//mListDetail.startAnimation(mSlideOut);
 
-			TextView tv = null;
+			//TextView tv = null;
 			final ListView lv = getListView();
-			if (lv.getFooterViewsCount() == 0) {
-				tv = new TextView(mContext);
-				lv.addFooterView(tv);
-			}
+			//if (lv.getFooterViewsCount() == 0) {
+				//tv = new TextView(mContext);
+				//lv.addFooterView(tv);
+			//}
 			lv.setOnTouchListener(mGestureListener);
 
 			if (mRoute_id == null) { // showing all routes
-				//mTitle.setText("Stop " + mStop_id + " - all routes");
-				if (tv != null) {
-					tv.setText(R.string.tap_time_for_route);
-				}
+				mTitle.setText("Stop " + mStop_id + " - all routes");
+				//if (tv != null) {
+					//tv.setText(R.string.tap_time_for_route);
+				//}
 				final TimesArrayAdapter adapter = new TimesArrayAdapter(mContext, 
 								R.layout.row2layout, mListDetails);
 				mContext.setListAdapter(adapter);
 			} else {
 				// TODO should be route_short_name?
-				//mTitle.setText(mRoute_id + " - " + mHeadsign);
-				if (tv != null) {
-					tv.setText(R.string.tap_time_for_trip);
-				}
-				//final ListArrayAdapter adapter = new ListArrayAdapter(mContext, R.layout.rowlayout, mListDetails);
-				//lv.setListAdapter(adapter);
+				mTitle.setText(mRoute_id + " - " + mHeadsign);
+				//if (tv != null) {
+					//tv.setText(R.string.tap_time_for_trip);
+				//}
+				final ListArrayAdapter adapter = new ListArrayAdapter(mContext, 
+								R.layout.rowlayout, mListDetails);
+				mContext.setListAdapter(adapter);
 			}
 
 			// Calculate the time difference
@@ -256,7 +262,7 @@ public class TimesActivity extends ListActivity {
 				if (hourdiff >= 60) {
 					//msg = Toast.makeText(mContext, "Next bus leaves at " + ServiceCalendar.formattedTime(nextdeparture),
 					//		Toast.LENGTH_LONG);
-					msg = Toast.makeText(mContext, "Next bus leaves at " + nextdeparture,
+					msg = Toast.makeText(mContext, "Next bus leaves at " + ServiceCalendar.formattedTime(nextdeparture, true),
 							Toast.LENGTH_LONG);
 				} else {
 					final String plural = hourdiff > 1 ? "s" : "";

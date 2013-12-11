@@ -157,7 +157,7 @@ public class LocationFragmentHelper {
 					mStops[locidx].stop_name = csr.getString(3);
 
 					more = csr.moveToNext();
-					publishProgress(((int) ((++locidx / (float) maxcount) * 100)));
+					++locidx;
 				}
 				csr.close();
 			}
@@ -166,6 +166,9 @@ public class LocationFragmentHelper {
 			// Calculate the distance to each point in the array
 			final float[] results = new float[2];
 			for (final StopLocn s : mStops) {
+				if(mLocation == null) {
+					return null;
+				}
 				Location.distanceBetween(mLocation.getLatitude(), mLocation.getLongitude(), s.lat, s.lon, results);
 				s.dist = results[0];
 				s.bearing = results[1];

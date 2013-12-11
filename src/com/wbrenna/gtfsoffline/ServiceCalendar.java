@@ -421,23 +421,15 @@ public class ServiceCalendar {
 
 		String hours;
 		String seconds;
+		String newtime;
 		
-		if (time.substring(0,2) == "00")
-		{
-			hours = "";
-		}
-		else
-		{
-			hours = time.substring(0,2) + "h";
-		}
-
-		final String minutes = time.substring(2,4) + "m";
+		final String minutes = time.substring(2,4);
 
 		if (time.length() < 5)
 		{
 			seconds = "";
 		}
-		else if (time.substring(4,6) == "00")
+		else if (time.substring(4,6).equals("00"))
 		{
 			seconds = "";
 		}
@@ -445,9 +437,9 @@ public class ServiceCalendar {
 		{
 			seconds = time.substring(4,6) + "s";
 		}
-
-		String newtime = hours + minutes + seconds;
-
+	
+		newtime = time.substring(0,2) + ":" + minutes + seconds;
+		
 		int inthours;
 		try {
 			inthours = Integer.parseInt(time.substring(0,2));
@@ -462,7 +454,7 @@ public class ServiceCalendar {
 		}
 
 		try {
-			hours = Integer.toString(inthours);
+			hours = Integer.toString(inthours) + ":";
 		} catch (final Error e) {
 			Log.d(TAG, "Error converting integer to string!" + e.getMessage());
 			return newtime;
@@ -474,13 +466,13 @@ public class ServiceCalendar {
 			return newtime;
 		}
 
-		final String AM = "am", PM = "pm";
+		final String AM = " am", PM = " pm";
 
 		if (inthours > 12)
 		{
 			inthours = inthours - 12;
 			try {
-				newtime =  Integer.toString(inthours) + minutes + seconds + PM;
+				newtime =  Integer.toString(inthours) + ":" + minutes + seconds + PM;
 			} catch (final Error e) {
 				Log.d(TAG, "Error converting integer to string!" + e.getMessage());
 				return newtime;
@@ -491,7 +483,7 @@ public class ServiceCalendar {
 		{
 
 			try {
-				newtime =  Integer.toString(inthours) + minutes + seconds + PM;
+				newtime =  Integer.toString(inthours) + ":" + minutes + seconds + PM;
 			} catch (final Error e) {
 				Log.d(TAG, "Error converting integer to string!" + e.getMessage());
 				return newtime;
@@ -502,7 +494,7 @@ public class ServiceCalendar {
 		else
 		{
 			try {
-				newtime =  Integer.toString(inthours) + minutes + seconds + AM;
+				newtime =  Integer.toString(inthours) + ":" + minutes + seconds + AM;
 			} catch (final Error e) {
 				Log.d(TAG, "Error converting integer to string!" + e.getMessage());
 				return newtime;

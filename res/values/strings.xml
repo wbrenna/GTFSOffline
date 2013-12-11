@@ -4,6 +4,7 @@
     <string name="app_name">GTFSOffline</string>
     <string name="action_settings">Settings</string>
     <string name="favs">Favourites</string>
+    <string name="routestitle">Routes List</string>
 
     <string name="pref_dbs">databases</string>  
     <string name="use_dbs">Databases to Monitor</string>

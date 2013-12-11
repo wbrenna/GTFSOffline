@@ -4,26 +4,20 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-     <RelativeLayout
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
-        <Button
-            android:id="@+id/titlelogo"
-            android:layout_width="44dp"
-            android:layout_height="36dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:onClick="onTitlebarClick" />
+       <TextView
+           android:id="@+id/listtitle"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_centerVertical="true"
+           android:layout_centerHorizontal="true"
+           android:maxLines="1"
+           android:text="@string/app_name" />
         
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/listtitle"
-        style="@style/List.Title"
-        android:paddingBottom="3dip"
-        android:paddingLeft="3dip"
-        android:text="@string/loading_times" />
 
     <LinearLayout
         android:id="@+id/detail_area"
