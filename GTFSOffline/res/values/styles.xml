@@ -44,8 +44,8 @@
         <item name="android:background">@color/list_dark_background</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:textSize">18sp</item>
-        <item name="android:paddingRight">5dip</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:paddingRight">1dip</item>
     </style>
 
     <style name="List.Title" parent="@android:style/TextAppearance.Medium">

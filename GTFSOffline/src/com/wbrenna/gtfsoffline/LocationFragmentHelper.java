@@ -211,32 +211,53 @@ public class LocationFragmentHelper {
 				// departuretime	runstoday	trip_id		route_short_name	trip_headsign
 				//	140300				1		34867		13					Route 13 Laurelwood
 				
-				
-				final Time t = new Time();
-				t.setToNow();
+
 				if (fullResults == null)
 				{
-					return null;
+					if (stop_limit < mStops.length - 1) {
+						stop_limit++;
+					}
+					continue;
 				}
+				final Time t = new Time();
+				t.setToNow();
 				for (String[] str: fullResults) {
 					//process str[0] to get the right departure time
 					final String hours = str[0].substring(0,2);
 					final String minutes = str[0].substring(2,4);
 					String departsIn;
-					if( (Integer.parseInt(hours) - t.hour) == 0 ) {
-						departsIn = "Departs in " 
-								+ Integer.toString(Integer.parseInt(minutes) - t.minute) 
-								+ " minutes";
+					if (t.hour == 0) {	
+						if( (Integer.parseInt(hours) - 24) == 0 ) {
+							departsIn = "Departs in " 
+									+ Integer.toString(Integer.parseInt(minutes) - t.minute) 
+									+ " minutes";
+						}
+						else {
+							//just use the remainder since our we only look for trips within the hour
+							departsIn = "Departs in "
+										+ Integer.toString(60 + Integer.parseInt(minutes) - t.minute) 
+										+ " minutes";
+						}
+						
+						mListDetails.add(new String[] { dist, s.stop_id, s.stop_name, 
+											str[4], departsIn ,str[2]});
 					}
 					else {
-						//just use the remainder since our we only look for trips within the hour
-						departsIn = "Departs in "
-									+ Integer.toString(60 + Integer.parseInt(minutes) - t.minute) 
+						if( (Integer.parseInt(hours) - t.hour) == 0 ) {
+							departsIn = "Departs in " 
+									+ Integer.toString(Integer.parseInt(minutes) - t.minute) 
 									+ " minutes";
+						}
+						else {
+							//just use the remainder since our we only look for trips within the hour
+							departsIn = "Departs in "
+										+ Integer.toString(60 + Integer.parseInt(minutes) - t.minute) 
+										+ " minutes";
+						}
+						
+						mListDetails.add(new String[] { dist, s.stop_id, s.stop_name, 
+											str[4], departsIn ,str[2]});
 					}
-					
-					mListDetails.add(new String[] { dist, s.stop_id, s.stop_name, 
-										str[4], departsIn ,str[2]});
 				}
 			}
 

@@ -95,6 +95,7 @@ public class ServiceCalendar {
 		final String end = csr.getString(csr.getColumnIndex("end_date"));
 		if (date.compareTo(start) < 0 || date.compareTo(end) > 0) {
 			// return "Schedule data has expired!";
+			//TODO: put a toast here alerting the user
 			return null;
 		}
 
@@ -140,7 +141,7 @@ public class ServiceCalendar {
 
 	// Return a string showing the days a bus runs, or null if it doesn't
 	// run on the given date. Limit to correct days of week, or not.
-	public String getTripDaysofWeek(String trip_id, String date, boolean limit) {
+	public String getTripDaysofWeek(String trip_id, String date, boolean limittotoday) {
 
 		String retstr = null;
 
@@ -164,7 +165,7 @@ public class ServiceCalendar {
 		}
 
 		// First check the cache
-		if (limit) {
+		if (limittotoday) {
 			if (truemap.containsKey(service_id + date)) {
 				retstr = truemap.get(service_id + date);
 				// Log.v(TAG, "Retrieved " + service_id+":"+date + " -> " + retstr + " from truecache");
@@ -180,11 +181,11 @@ public class ServiceCalendar {
 
 		final String[] selectargs = { service_id };
 		final Cursor csr = mDB.rawQuery(mDBQuery, selectargs);
-		retstr = process_db(service_id, date, limit, csr);
+		retstr = process_db(service_id, date, limittotoday, csr);
 		csr.close();
 
 		// Save in cache
-		if (limit) {
+		if (limittotoday) {
 			truemap.put(service_id + date, retstr);
 		} else {
 			falsemap.put(service_id + date, retstr);
@@ -199,9 +200,18 @@ public class ServiceCalendar {
 	public ArrayList<String[]> getNextDepartureTimes(String stopid, int maxResults) {
 		final Time t = new Time();
 		t.setToNow();
-		final String timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
-		//add one minute to prevent negative-one minute errors
-		final String timelimit = String.format("%02d%02d%02d", t.hour+1,t.minute,t.second);
+		final String timenow;
+		final String timelimit;
+		if (t.hour == 0) {
+			timenow = String.format("%02d%02d%02d", 24, t.minute+1, t.second);
+			timelimit = String.format("%02d%02d%02d", 24+1,t.minute,t.second);
+		}
+		else {
+			timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
+			//add one minute to prevent negative-one minute errors
+			timelimit = String.format("%02d%02d%02d", t.hour+1,t.minute,t.second);
+		}
+
 		final String date = String.format("%04d%02d%02d", t.year, t.month, t.monthDay);
 		
 //		final ArrayList<String[]> listdetails = getRouteDepartureTimes(stopid, date, true, null);
@@ -264,8 +274,9 @@ public class ServiceCalendar {
 
 				final String q2 = "select route_long_name, route_short_name, trip_headsign from routes " +
 						"join trips on routes.route_id = trips.route_id where trip_id = ?";
-				final String[] selectargs2 = new String[] { listdetails.get(i)[2], listdetails.get(i)[0] };
-				final Cursor csr2 = mDB.rawQuery(q2, selectargs2);
+				//final String[] selectargs2 = new String[] { listdetails.get(i)[2], listdetails.get(i)[0] };
+				final String[] selectargs2 = new String[] { listdetails.get(i)[2] };
+				final Cursor csr2 = mDatabaseHelper.ReadableDB(mDBName, mDB).rawQuery(q2, selectargs2);
 				csr2.moveToFirst();
 				//this should have only one element (trip_id is unique!)
 				//the format of this:
@@ -299,8 +310,17 @@ public class ServiceCalendar {
 		//final ArrayList<String[]> listdetails = getRouteDepartureTimes(stopid, routeid, headsign, date, true, null);
 		final Time t = new Time();
 		t.setToNow();
-		final String timenow = String.format("%02d%02d%02d", t.hour, t.minute, t.second);
-		final String timelimit = String.format("%02d%02d%02d", t.hour+1,t.minute,t.second);
+		final String timenow;
+		final String timelimit;
+		if (t.hour == 0) {
+			timenow = String.format("%02d%02d%02d", 24, t.minute+1, t.second);
+			timelimit = String.format("%02d%02d%02d", 24+1,t.minute,t.second);
+		}
+		else {
+			timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
+			//add one minute to prevent negative-one minute errors
+			timelimit = String.format("%02d%02d%02d", t.hour+1,t.minute,t.second);
+		}
 		final String date = String.format("%04d%02d%02d", t.year, t.month + 1, t.monthDay);
 		
 		final String q = "select trip_id,departure_time from stop_times where stop_id = ? and departure_time >= ? and departure_time <= ?"
@@ -384,7 +404,7 @@ public class ServiceCalendar {
 		return listdetails;
 	}
 	public ArrayList<String[]> getRouteDepartureTimes(String stopid, String routeid, String headsign, String date,
-			boolean limittotoday, SQLiteDatabase aDB) {
+			boolean dontlimittotoday, SQLiteDatabase aDB) {
 
 		final String q = "select distinct departure_time as _id, trip_id from stop_times where stop_id = ? and trip_id in "
 				+ "(select trip_id from trips where route_id = ? and trip_headsign = ?) order by departure_time";
@@ -399,7 +419,7 @@ public class ServiceCalendar {
 		while (more) {
 
 			final String trip_id = csr.getString(1);
-			final String daysstr = getTripDaysofWeek(trip_id, date, limittotoday);
+			final String daysstr = getTripDaysofWeek(trip_id, date, !dontlimittotoday);
 
 			// Only add if the bus runs on this day.
 			if (daysstr != null) {

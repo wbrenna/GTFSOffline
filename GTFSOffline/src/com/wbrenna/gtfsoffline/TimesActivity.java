@@ -60,6 +60,7 @@ public class TimesActivity extends ListActivity {
 	private SQLiteDatabase mDB;
 	private SharedPreferences mPrefs;
 	private boolean ampmflag;
+	private DatabaseHelper DBHelper;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -76,14 +77,14 @@ public class TimesActivity extends ListActivity {
 		mTitle = (TextView) findViewById(R.id.listtitle);
 
 		
-		Log.e(TAG,"List of data: " + mTrip_id + mHeadsign + mStop_id + mDBName);
+		//Log.e(TAG,"List of data: " + mTrip_id + mHeadsign + mStop_id + mDBName);
 		//Set up shared preferences and get the database key.
 		
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		showAllTrips = mPrefs.getBoolean(mContext.getString(R.string.pref_showallbusses_key), false);
 		ampmflag = mPrefs.getBoolean(mContext.getString(R.string.pref_ampmtimes_key), false);
 
-		DatabaseHelper DBHelper = new DatabaseHelper(this);
+		DBHelper = new DatabaseHelper(this);
 		
 		getActionBar().setTitle(R.string.routestitle);
 
@@ -145,7 +146,15 @@ public class TimesActivity extends ListActivity {
 			// Will find where to position the list of bus departure times
 			final Time t = new Time();
 			t.setToNow();
-			final String timenow = String.format("%02d%02d%02d", t.hour, t.minute, t.second);
+			final String timenow;
+			if (t.hour == 0) {
+				timenow = String.format("%02d%02d%02d", 24, t.minute, t.second);
+			}
+			else {
+				timenow = String.format("%02d%02d%02d", t.hour, t.minute, t.second);
+			}
+
+			//TODO: Check this month + 1 thing...
 			final String datenow = String.format("%04d%02d%02d", t.year, t.month + 1, t.monthDay);
 
 			// Make sure we actually have some valid data, since schedules change often.
@@ -234,7 +243,7 @@ public class TimesActivity extends ListActivity {
 					//tv.setText(R.string.tap_time_for_route);
 				//}
 				final TimesArrayAdapter adapter = new TimesArrayAdapter(mContext, 
-								R.layout.row2layout, mListDetails);
+								R.layout.row2layout, ampmflag, mListDetails);
 				mContext.setListAdapter(adapter);
 			} else {
 				// TODO should be route_short_name?
@@ -264,11 +273,13 @@ public class TimesActivity extends ListActivity {
 				if (hourdiff >= 60) {
 					//msg = Toast.makeText(mContext, "Next bus leaves at " + ServiceCalendar.formattedTime(nextdeparture),
 					//		Toast.LENGTH_LONG);
-					msg = Toast.makeText(mContext, "Next bus leaves at " + ServiceCalendar.formattedTime(nextdeparture, true),
+					msg = Toast.makeText(mContext, "Next bus leaves at " + 
+							ServiceCalendar.formattedTime(nextdeparture, ampmflag),
 							Toast.LENGTH_LONG);
 				} else {
 					final String plural = hourdiff > 1 ? "s" : "";
-					msg = Toast.makeText(mContext, "Next bus leaves in " + hourdiff + " minute" + plural, Toast.LENGTH_LONG);
+					msg = Toast.makeText(mContext, "Next bus leaves in " + hourdiff 
+							+ " minute" + plural, Toast.LENGTH_LONG);
 				}
 
 				getListView().setSelectionFromTop(savedpos, 50); // position next bus just below top

@@ -38,15 +38,18 @@ public class TimesArrayAdapter extends ArrayAdapter <String[]> {
 	private final ArrayList<String[]> mDetails;
 	private final LayoutInflater mInflater;
 	private final int mLayout;
+	private boolean ampmflag;
 
 	//public TimesArrayAdapter(ListActivity context, int layout, ArrayList<String[]> details) {
-	public TimesArrayAdapter(ListActivity context, int layout, ArrayList<String[]> details) {
+	public TimesArrayAdapter(ListActivity context, int layout, 
+					boolean ampm, ArrayList<String[]> details) {
 		super(context, layout, details);
 		// Log.v(TAG, "TimesArrayAdapter()");
 
 		mDetails = details;
 		mInflater = LayoutInflater.from(context);
 		mLayout = layout;
+		ampmflag = ampm;
 	}
 
 	static class ViewHolder {
@@ -79,7 +82,7 @@ public class TimesArrayAdapter extends ArrayAdapter <String[]> {
 			holder = (ViewHolder) view.getTag();
 		}
 
-		holder.stoptime.setText(ServiceCalendar.formattedTime(mDetails.get(position)[0], false));
+		holder.stoptime.setText(ServiceCalendar.formattedTime(mDetails.get(position)[0], ampmflag));
 		holder.desc.setText(mDetails.get(position)[1]);
 
 		// Look for things like route 7A, where the A is part of the description
