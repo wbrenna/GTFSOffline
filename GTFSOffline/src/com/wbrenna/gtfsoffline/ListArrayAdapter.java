@@ -42,15 +42,17 @@ public class ListArrayAdapter extends ArrayAdapter <String[]> {
 	private final ArrayList<String[]> mDetails;
 	private final LayoutInflater mInflater;
 	private final int mLayout;
+	private boolean ampmflag;
 
 
-	public ListArrayAdapter(ListActivity context, int layout, ArrayList<String[]> details) {
+	public ListArrayAdapter(ListActivity context, int layout, boolean ampm, ArrayList<String[]> details) {
 		super(context, layout, details);
 		// Log.v(TAG, "TimesArrayAdapter()");
 
 		mDetails = details;
 		mInflater = LayoutInflater.from(context);
 		mLayout = layout;
+		ampmflag = ampm;
 	}
 
 	static class ViewHolder {
@@ -80,7 +82,7 @@ public class ListArrayAdapter extends ArrayAdapter <String[]> {
 			holder = (ViewHolder) view.getTag();
 		}
 
-		holder.stoptime.setText(ServiceCalendar.formattedTime(mDetails.get(position)[0],false));
+		holder.stoptime.setText(ServiceCalendar.formattedTime(mDetails.get(position)[0],ampmflag));
 
 		holder.desc.setText(mDetails.get(position)[1]);
 		return view;

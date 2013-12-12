@@ -366,7 +366,7 @@ public class MainActivity extends FragmentActivity implements
 			
 			//Instead let's just force a view refresh
 			//return super.getItemPosition(object);
-			Log.e(TAG,"Updating positions");
+			//Log.e(TAG,"Updating positions");
 			return POSITION_NONE;
 		}
 		

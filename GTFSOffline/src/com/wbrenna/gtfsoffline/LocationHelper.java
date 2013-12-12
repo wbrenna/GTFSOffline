@@ -108,7 +108,7 @@ public class LocationHelper {
 	
 	public void unlinkLocation(LocationListener locationListener) {
 		//This will be called when we are exiting the program, etc, so we should shut down our database.
-		Log.e(TAG, "Unlinking LocationListener updates.");
+		//Log.e(TAG, "Unlinking LocationListener updates.");
 		mLocationManager.removeUpdates(locationListener);
 		//mLocationManager = null;
 	}

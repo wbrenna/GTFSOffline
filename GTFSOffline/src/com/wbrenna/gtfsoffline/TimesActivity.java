@@ -252,7 +252,7 @@ public class TimesActivity extends ListActivity {
 					//tv.setText(R.string.tap_time_for_trip);
 				//}
 				final ListArrayAdapter adapter = new ListArrayAdapter(mContext, 
-								R.layout.rowlayout, mListDetails);
+								R.layout.rowlayout, ampmflag, mListDetails);
 				mContext.setListAdapter(adapter);
 			}
 
