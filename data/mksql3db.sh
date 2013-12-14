@@ -82,6 +82,7 @@ EOT
 
 #sort the file stops.txt and create a column of numbers
 #$sortvar = "stop_sorted,"
+calendartest=false
 
 while [ $# -gt 0 ]
 do
@@ -111,7 +112,20 @@ do
 		echo ".import $tmpfile $table"
 	    ) | $SQ3 $DB.new
 	    ;;
-    calendar.txt|routes.txt|trips.txt|calendar_dates.txt)
+    calendar.txt|routes.txt|trips.txt)
+	    table=$(echo `basename $1` | sed -e 's/\..*//')
+	    #columns=$(head -1 $file)
+	    columns=$(cat $file | tr -d '\015' | head -n 1)
+	    #cat $file | sed -e1d > $tmpfile
+	    tail -n +2 "$file" > $tmpfile
+	    (
+		echo "create table $table($columns);"
+		echo ".separator ,"
+		echo ".import $tmpfile $table"
+	    ) | $SQ3 $DB.new
+	    ;;
+    calendar_dates.txt)
+	    calendartest=true
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
 	    #columns=$(head -1 $file)
 	    columns=$(cat $file | tr -d '\015' | head -n 1)
@@ -129,18 +143,18 @@ do
     shift
 done
 
-#$SQ3 $DB.new <<-EOT
-#  create index stops_stop_id on stops ( stop_id );
-#  create index routes_route_id on routes ( route_id );
-#  create index trips_trip_id on trips ( trip_id );
-#  create index stop_times_stop_id on stop_times ( stop_id );
-#  create index trips_route_id on trips ( route_id );
-#  create index shapes_shape_id on shapes ( shape_id );
-#  create index calendar_service_id on calendar ( service_id );
-#  create index calendar_dates_service_id on calendar_dates ( service_id );
-#  PRAGMA user_version = $version;
-#  vacuum;
-#EOT
+#This is not robust if some of these files don't exist. In particular, calendar_dates can be excluded. Handle that here:
+if [ !$calendartest ]
+then
+	echo "WARNING: Could not find calendar_dates.txt. Creating an empty table for holiday data..."
+	table="calendar_dates"
+	columns="service_id,date,exception_type"
+	(
+		echo "create table $table($columns);"
+		echo ".separator ,"
+	) | $SQ3 $DB.new
+fi
+	
 
 $SQ3 $DB.new <<-EOT
   create index stops_stop_id on stops ( stop_id );
