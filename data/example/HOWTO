@@ -1,0 +1,8 @@
+This is an example of an unzipped GO transit database.
+To create a database file, enter this database and run
+../mksql3db.sh GO.db *.txt
+
+The database GO.db will be created.
+On my computer it took about three minutes - the filtering
+and sorting of the data is quite computationally intensive
+(to take the work off of the phone!).

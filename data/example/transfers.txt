@@ -1,0 +1,4 @@
+from_stop_id,to_stop_id,transfer_type,min_transfer_time
+00052,00052,2,300
+09021,00052,2,300
+09021,09021,1,

@@ -1,0 +1,103 @@
+route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route_text_color
+1-1308,go,,Lakeshore West Train,2,FF0000,000000
+1-1312,go,,Lakeshore West Train,2,FF0000,000000
+12-1308,go,,Niagara Falls / Toronto,3,FF0000,000000
+12-1312,go,,Niagara Falls / Toronto,3,FF0000,000000
+15-1308,go,,McMaster,3,FF0000,000000
+15-1312,go,,McMaster,3,FF0000,000000
+16-1308,go,,Hamilton / Toronto Express,3,FF0000,000000
+16-1312,go,,Hamilton / Toronto Express,3,FF0000,000000
+18-1308,go,,Lakeshore West,3,FF0000,000000
+18-1312,go,,Lakeshore West,3,FF0000,000000
+19-1308,go,,Oakville / North York,3,FF0000,000000
+19-1312,go,,Oakville / North York,3,FF0000,000000
+20-1308,go,,Milton / Oakville,3,B56504,000000
+20-1312,go,,Milton / Oakville,3,B56504,000000
+21-1308,go,,Milton,3,B56504,000000
+21-1312,go,,Milton,3,B56504,000000
+2-1308,go,,Milton Train,2,B56504,000000
+2-1312,go,,Milton Train,2,B56504,000000
+25-1308,go,,Waterloo / Mississauga,3,B56504,000000
+25-1312,go,,Waterloo / Mississauga,3,B56504,000000
+27-1308,go,,Milton / North York,3,B56504,000000
+27-1312,go,,Milton / North York,3,B56504,000000
+29-1308,go,,Guelph / Mississauga,3,B56504,000000
+29-1312,go,,Guelph / Mississauga,3,B56504,000000
+30-1308,go,,Kitchener/ Bramalea,3,FFFFFF,000000
+30-1312,go,,Kitchener/ Bramalea,3,FFFFFF,000000
+31-1308,go,,Georgetown,3,FFFFFF,000000
+31-1312,go,,Georgetown,3,FFFFFF,000000
+3-1308,go,,Kitchener Train,2,FFFFFF,000000
+3-1312,go,,Kitchener Train,2,FFFFFF,000000
+32-1308,go,,Brampton Trinity Common / North York,3,FFFFFF,000000
+32-1312,go,,Brampton Trinity Common / North York,3,FFFFFF,000000
+33-1308,go,,Guelph / North York,3,FFFFFF,000000
+33-1312,go,,Guelph / North York,3,FFFFFF,000000
+34-1308,go,,Brampton / Pearson Airport / North York,3,FFFFFF,000000
+34-1312,go,,Brampton / Pearson Airport / North York,3,FFFFFF,000000
+35-1308,go,,Brampton / Humber College / North York,3,FFFFFF,000000
+35-1312,go,,Brampton / Humber College / North York,3,FFFFFF,000000
+36-1308,go,,Brampton / North York Express,3,FFFFFF,000000
+36-1312,go,,Brampton / North York Express,3,FFFFFF,000000
+37-1308,go,,Orangeville / Brampton,3,FFFFFF,000000
+37-1312,go,,Orangeville / Brampton,3,FFFFFF,000000
+38-1308,go,,Bolton / North York,3,FFFFFF,000000
+38-1312,go,,Bolton / North York,3,FFFFFF,000000
+39-1308,go,,Guelph / Bramalea,3,FFFFFF,000000
+39-1312,go,,Guelph / Bramalea,3,FFFFFF,000000
+40-1308,go,,Pearson Airport Express,3,FFFFFF,000000
+40-1312,go,,Pearson Airport Express,3,FFFFFF,000000
+45-1308,go,,Mississauga / York University,3,FFFFFF,000000
+45-1312,go,,Mississauga / York University,3,FFFFFF,000000
+46-1308,go,,Oakville / York University,3,FFFFFF,000000
+46-1312,go,,Oakville / York University,3,FFFFFF,000000
+47-1308,go,,Hamilton / York University,3,FFFFFF,000000
+47-1312,go,,Hamilton / York University,3,FFFFFF,000000
+48-1308,go,,Guelph / York University,3,FFFFFF,000000
+48-1312,go,,Guelph / York University,3,FFFFFF,000000
+51-1308,go,,Pickering / York University,3,72B4E3,000000
+51-1312,go,,Pickering / York University,3,72B4E3,000000
+5-1308,go,,Barrie Train,2,72B4E3,000000
+5-1312,go,,Barrie Train,2,72B4E3,000000
+52-1308,go,,Oshawa / York University,3,72B4E3,000000
+52-1312,go,,Oshawa / York University,3,72B4E3,000000
+54-1308,go,,Markham / York University,3,72B4E3,000000
+54-1312,go,,Markham / York University,3,72B4E3,000000
+61-1308,go,,Richmond Hill,3,55557F,000000
+61-1312,go,,Richmond Hill,3,55557F,000000
+6-1308,go,,Richmond Hill Train,2,55557F,000000
+6-1312,go,,Richmond Hill Train,2,55557F,000000
+63-1308,go,,King City / Toronto,3,55557F,000000
+63-1312,go,,King City / Toronto,3,55557F,000000
+65-1308,go,,Newmarket / Toronto,3,55557F,000000
+65-1312,go,,Newmarket / Toronto,3,55557F,000000
+66-1308,go,,Newmarket / North York Express,3,55557F,000000
+66-1312,go,,Newmarket / North York Express,3,55557F,000000
+67-1308,go,,Keswick / North York,3,55557F,000000
+67-1312,go,,Keswick / North York,3,55557F,000000
+68-1308,go,,Barrie / Newmarket,3,55557F,000000
+68-1312,go,,Barrie / Newmarket,3,55557F,000000
+70-1308,go,,Uxbridge / Unionville,3,AA55FF,000000
+70-1312,go,,Uxbridge / Unionville,3,AA55FF,000000
+71-1308,go,,Stouffville,3,AA55FF,000000
+71-1312,go,,Stouffville,3,AA55FF,000000
+7-1308,go,,Stouffville Train,2,AA55FF,000000
+7-1312,go,,Stouffville Train,2,AA55FF,000000
+81-1308,go,,Port Perry / Whitby,3,FFFFFF,000000
+81-1312,go,,Port Perry / Whitby,3,FFFFFF,000000
+88-1308,go,,Peterborough / Oshawa,3,FFFFFF,000000
+88-1312,go,,Peterborough / Oshawa,3,FFFFFF,000000
+90-1308,go,,Newcastle / Oshawa,3,FFFFFF,000000
+90-1312,go,,Newcastle / Oshawa,3,FFFFFF,000000
+91-1308,go,,Newcastle / Oshawa,3,FFFFFF,000000
+91-1312,go,,Newcastle / Oshawa,3,FFFFFF,000000
+9-1308,go,,Lakeshore East Train,2,FFFFFF,000000
+9-1312,go,,Lakeshore East Train,2,FFFFFF,000000
+92-1308,go,,Oshawa / Yorkdale,3,FFFFFF,000000
+92-1312,go,,Oshawa / Yorkdale,3,FFFFFF,000000
+93-1308,go,,Durham College / UOIT / Scarborough Express,3,FFFFFF,000000
+93-1312,go,,Durham College / UOIT / Scarborough Express,3,FFFFFF,000000
+96-1308,go,,Oshawa / Finch Express,3,FFFFFF,000000
+96-1312,go,,Oshawa / Finch Express,3,FFFFFF,000000
+98-1308,go,,Pickering / Finch Express,3,FFFFFF,000000
+98-1312,go,,Pickering / Finch Express,3,FFFFFF,000000
