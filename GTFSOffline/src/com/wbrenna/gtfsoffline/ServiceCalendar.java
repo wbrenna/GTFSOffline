@@ -50,6 +50,7 @@ public class ServiceCalendar {
 	private String mDBName;
 	private DatabaseHelper mDatabaseHelper;
 	private boolean ampm;
+	private final int hoursLookAhead = 1;
 	
 	public ServiceCalendar(String aDBName, SQLiteDatabase aDB, boolean ampmflag) {
 		// Log.v(TAG, "ServiceCalendar()");
@@ -164,6 +165,7 @@ public class ServiceCalendar {
 			return null;
 		}
 
+		//TODO: need to fix this now that hours are simplified
 		// First check the cache
 		if (limittotoday) {
 			if (truemap.containsKey(service_id + date)) {
@@ -202,26 +204,28 @@ public class ServiceCalendar {
 		t.setToNow();
 		final String timenow;
 		final String timelimit;
-		if (t.hour == 0) {
-			timenow = String.format("%02d%02d%02d", 24, t.minute+1, t.second);
-			timelimit = String.format("%02d%02d%02d", 24+1,t.minute,t.second);
+		String q;
+
+		//add one minute to prevent negative-one minute errors
+		timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
+
+		if (t.hour+hoursLookAhead >= 24) {
+			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead-24,t.minute,t.second);
+			q = "select distinct trip_id,departure_time from stop_times where stop_id = ? and (departure_time >= ? or departure_time <= ?)";
 		}
 		else {
-			timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
-			//add one minute to prevent negative-one minute errors
-			timelimit = String.format("%02d%02d%02d", t.hour+1,t.minute,t.second);
+			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead,t.minute,t.second);
+			q = "select distinct trip_id,departure_time from stop_times where stop_id = ? and departure_time >= ? and departure_time <= ?";
 		}
 
+		//TODO: need to use the date as previous day for correct weekend service, etc.
+		//this could be handled earlier in holiday days etc.
 		final String date = String.format("%04d%02d%02d", t.year, t.month, t.monthDay);
 		
 //		final ArrayList<String[]> listdetails = getRouteDepartureTimes(stopid, date, true, null);
 //we will need to significantly optimize this - first of all, we don't want to get ALL route departure times!
 //this can be further optimized by only collecting the next few buses for a given route!
 
-		final String q = "select distinct trip_id,departure_time from stop_times where stop_id = ? and departure_time >= ? and departure_time <= ?";
-					//maybe we don't need * ... just return what we need
-		//we use the ordered results so that only time/route details are returned for the next hour.
-		//distinct so that we don't get duplicates here!
 		
 		//final String q = "select distinct departure_time as _id, trip_id from stop_times where stop_id = ? and trip_id in "
 		//		+ "(select trip_id from trips where route_id = ? and trip_headsign = ?) order by departure_time";
@@ -312,23 +316,26 @@ public class ServiceCalendar {
 		t.setToNow();
 		final String timenow;
 		final String timelimit;
-		if (t.hour == 0) {
-			timenow = String.format("%02d%02d%02d", 24, t.minute+1, t.second);
-			timelimit = String.format("%02d%02d%02d", 24+1,t.minute,t.second);
+		String q;
+
+		timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
+
+		if (t.hour + hoursLookAhead >= 24) {
+			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead-24,t.minute,t.second);
+			q = "select trip_id,departure_time from stop_times where stop_id = ? and (departure_time >= ? or departure_time <= ?)"
+					+ "join trips on trip_id = ? where trip_headsign = ?";
+
 		}
 		else {
-			timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
 			//add one minute to prevent negative-one minute errors
-			timelimit = String.format("%02d%02d%02d", t.hour+1,t.minute,t.second);
+			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead,t.minute,t.second);
+			q = "select trip_id,departure_time from stop_times where stop_id = ? and departure_time >= ? and departure_time <= ?"
+					+ "join trips on trip_id = ? where trip_headsign = ?";
+
 		}
+		//TODO: Why is the month incremented here?
 		final String date = String.format("%04d%02d%02d", t.year, t.month + 1, t.monthDay);
 		
-		final String q = "select trip_id,departure_time from stop_times where stop_id = ? and departure_time >= ? and departure_time <= ?"
-					+ "join trips on trip_id = ? where trip_headsign = ?";
-					//maybe we don't need * ... just return what we need
-
-		//final String q = "select distinct departure_time as _id, trip_id from stop_times where stop_id = ? and trip_id in "
-		//		+ "(select trip_id from trips where route_id = ? and trip_headsign = ?) order by departure_time";
 		final String[] selectargs = new String[] { stopid, timenow, timelimit, routeid, headsign };
 		final Cursor csr = mDatabaseHelper.ReadableDB(mDBName, mDB).rawQuery(q, selectargs);
 		
@@ -370,7 +377,7 @@ public class ServiceCalendar {
 			return null;
 		}
 	}
-	/* Return a list of times that all busses for all routes depart a given stop, sorted by time. List is departure_time,
+	/* Return a list of times that all buses for all routes depart a given stop, sorted by time. List is departure_time,
 	 * route_id, trip_headsign. */
 	public ArrayList<String[]> getRouteDepartureTimes(String stopid, String date, 
 				boolean dontlimittotoday, SQLiteDatabase aDB) {
@@ -393,6 +400,7 @@ public class ServiceCalendar {
 			final String daysstr = getTripDaysofWeek(trip_id, date, !dontlimittotoday);
 
 			// Only add if the bus runs on this day.
+			//TODO: Fix this
 			if (daysstr != null) {
 				listdetails.add(new String[] { csr.getString(0), daysstr, csr.getString(2), csr.getString(3) });
 			}
