@@ -145,7 +145,7 @@ do
 done
 
 #This is not robust if some of these files don't exist. In particular, calendar_dates can be excluded. Handle that here:
-if [ ! $calendartest ]
+if ! $calendartest
 then
 	echo "WARNING: Could not find calendar_dates.txt. Creating an empty table for holiday data..."
 	table="calendar_dates"
