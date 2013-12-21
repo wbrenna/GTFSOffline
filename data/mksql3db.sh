@@ -93,7 +93,7 @@ do
 	    table=$(echo `basename $file` | sed -e 's/\..*//')
 	    columns="stop_sorted,$(cat $file | tr -d '\015' | head -n 1)"
 	    #tail -n +2 "$file" | sort -k6 -g -t, | cat -n -s | awk '{ $1 = $1","; print}' > $tmpfile
-	    tail -n +2 "stops.txt" | sort -k6 -g -t, | grep -n '^' - | sed -e 's/:/,/g' > $tmpfile
+	    tail -n +2 "stops.txt" | sort -k6 -g -t, | grep -n '^' - | sed -e 's/\([0-9]\):/\1,/g' > $tmpfile
 	    (
 		echo "create table $table($columns);"
 		echo ".separator ,"
@@ -105,7 +105,8 @@ do
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
 	    #columns=$(head -1 $file)
 	    columns=$(cat $file | tr -d '\015' | head -n 1)
-	    tail -n +2 "$file" | sed -e 's/\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/0\1\2\3/g' | sed -e 's/://g' > $tmpfile
+	    #tail -n +2 "stop_times.txt" | sed -e 's/\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/0\1\2\3/g' | sed -e 's/://g' > $tmpfile
+	    tail "stop_times.txt" | sed -e 's/?\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/0\1\2\3/g' | sed -e 's/\(^.*\)\(2[4-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/echo \1`echo  "$(echo \2 - 24|bc)"`:\3:\4/ge' | sed -e 's/\(^.*\)\(2[4-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/echo \1`echo  "$(echo \2 - 24|bc)"`:\3:\4/ge' | sed -e 's/\([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/0\1\2\3/g' | sed -e 's/://g'
 	    (
 		echo "create table $table($columns);"
 		echo ".separator ,"
@@ -144,7 +145,7 @@ do
 done
 
 #This is not robust if some of these files don't exist. In particular, calendar_dates can be excluded. Handle that here:
-if [ !$calendartest ]
+if [ ! $calendartest ]
 then
 	echo "WARNING: Could not find calendar_dates.txt. Creating an empty table for holiday data..."
 	table="calendar_dates"

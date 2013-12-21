@@ -426,6 +426,12 @@ public class MainActivity extends FragmentActivity implements
 		}
 		
 		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setRetainInstance(true);
+		}
+		
+		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			super.onActivityCreated(savedInstanceState);
 			
@@ -473,6 +479,12 @@ public class MainActivity extends FragmentActivity implements
 			return inflater.inflate(R.layout.fragment_main_db, container, false);
 			
 
+		}
+		
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setRetainInstance(true);
 		}
 		
 		@Override

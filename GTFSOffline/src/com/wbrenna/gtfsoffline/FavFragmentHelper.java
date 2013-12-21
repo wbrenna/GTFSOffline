@@ -144,7 +144,7 @@ public class FavFragmentHelper {
 				return null;
 			}
 			for (int i = 0; i<tmpStops.size(); i++) {
-				Log.e(TAG, "Stops are: " + Arrays.toString(tmpStops.get(i)));
+				//Log.e(TAG, "Stops are: " + Arrays.toString(tmpStops.get(i)));
 				mStops[i] = new StopLocn();
 				mStops[i].stop_id = tmpStops.get(i)[0];
 				mStops[i].stop_name = tmpStops.get(i)[1];
@@ -189,7 +189,7 @@ public class FavFragmentHelper {
 										+ Integer.toString(60 + Integer.parseInt(minutes) - t.minute) 
 										+ " minutes";
 						}
-						Log.e(TAG, "Adding to list: " + s.stop_name);
+						//Log.e(TAG, "Adding to list: " + s.stop_name);
 						mListDetails.add(new String[] { "", s.stop_id, s.stop_name, str[4], departsIn, str[2] });
 					}
 				}
@@ -217,7 +217,7 @@ public class FavFragmentHelper {
 	
 	// Called for a long click
 	public void onListItemLongClick(AdapterView<?> parent, View v, int position, long id) {
-		Log.v(TAG, "long clicked position " + position);
+		//Log.v(TAG, "long clicked position " + position);
 
 		final String[] strs = (String[]) parent.getItemAtPosition(position);
 		if (strs == null) {
