@@ -222,54 +222,15 @@ public class LocationFragmentHelper {
 				final Time t = new Time();
 				t.setToNow();
 				for (String[] str: fullResults) {
-					//process str[0] to get the right departure time
+					//process the result string to get the right departure time
 					final String hours = str[0].substring(0,2);
 					final String minutes = str[0].substring(2,4);
-					String departsIn;
-					if (t.hour == 0) {	
-						if( (Integer.parseInt(hours) - 24) == 0 ) {
-							departsIn = "Departs in " 
-									+ Integer.toString(Integer.parseInt(minutes) - t.minute) 
-									+ " minutes";
-						}
-						else {
-							//just use the remainder since our we only look for trips within the hour
-							departsIn = "Departs in "
-										+ Integer.toString(60 + Integer.parseInt(minutes) - t.minute) 
-										+ " minutes";
-						}
-						
-						mListDetails.add(new String[] { dist, s.stop_id, s.stop_name, 
-											str[4], departsIn ,str[2]});
-					}
-					else {
-						if( (Integer.parseInt(hours) - t.hour) == 0 ) {
-							departsIn = "Departs in " 
-									+ Integer.toString(Integer.parseInt(minutes) - t.minute) 
-									+ " minutes";
-						}
-						else {
-							//just use the remainder since our we only look for trips within the hour
-							departsIn = "Departs in "
-										+ Integer.toString(60 + Integer.parseInt(minutes) - t.minute) 
-										+ " minutes";
-						}
-						
-						mListDetails.add(new String[] { dist, s.stop_id, s.stop_name, 
-											str[4], departsIn ,str[2]});
-					}
+					//String departsIn;
+
+					mListDetails.add(new String[] { dist, s.stop_id, s.stop_name, 
+							str[4], myBusService.formattedDepartureTime(t, hours, minutes) ,str[2]});
 				}
 			}
-
-			//Finally we can sort this by time.
-			//Should already be sorted!
-			/**Arrays.sort(mListDetails, new Comparator<StopLocn>() {
-				@Override
-				public int compare(StopLocn entry1, StopLocn entry2) {
-					return entry1.dist < entry2.dist ? -1 : entry1.dist == entry2.dist ? 0 : 1;
-				}
-			});
-			**/
 			
 			return null;
 		}

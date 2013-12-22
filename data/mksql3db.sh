@@ -105,8 +105,10 @@ do
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
 	    #columns=$(head -1 $file)
 	    columns=$(cat $file | tr -d '\015' | head -n 1)
-	    #tail -n +2 "stop_times.txt" | sed -e 's/\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/0\1\2\3/g' | sed -e 's/://g' > $tmpfile
-	    tail -n +2 "stop_times.txt" | sed -e 's/?\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/0\1\2\3/g' | sed -e 's/\(^.*\)\(2[4-9]\|[3-4][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/echo \1`echo  "$(echo \2 - 24|bc)"`:\3:\4/ge' | sed -e 's/\(^.*\)\(2[4-9]\|[3-4][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/echo \1`echo  "$(echo \2 - 24|bc)"`:\3:\4/ge' | sed -e 's/\,\([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/://g' > $tmpfile
+	    tail -n +2 "stop_times.txt" | sed -e 's/\,\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/\,\([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/://g' > $tmpfile
+
+	    #This nifty command will strip times between 24:00:00 and 48:00:00 down to 000000-235959. Unfortunately it's not exactly needed!
+	    #tail -n +2 "stop_times.txt" | sed -e 's/?\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/0\1\2\3/g' | sed -e 's/\(^.*\)\(2[4-9]\|[3-4][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/echo \1`echo  "$(echo \2 - 24|bc)"`:\3:\4/ge' | sed -e 's/\(^.*\)\(2[4-9]\|[3-4][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/echo \1`echo  "$(echo \2 - 24|bc)"`:\3:\4/ge' | sed -e 's/\,\([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/://g' > $tmpfile
 	    (
 		echo "create table $table($columns);"
 		echo ".separator ,"

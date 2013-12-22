@@ -20,6 +20,7 @@
 package com.wbrenna.gtfsoffline;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 import android.app.AlertDialog;
@@ -147,16 +148,26 @@ public class TimesActivity extends ListActivity {
 			final Time t = new Time();
 			t.setToNow();
 			final String timenow;
-			if (t.hour == 0) {
-				timenow = String.format("%02d%02d%02d", 24, t.minute, t.second);
-			}
-			else {
-				timenow = String.format("%02d%02d%02d", t.hour, t.minute, t.second);
-			}
 
 			//TODO: Check this month + 1 thing...
-			final String datenow = String.format("%04d%02d%02d", t.year, t.month + 1, t.monthDay);
-
+			//final String datenow = String.format("%04d%02d%02d", t.year, t.month + 1, t.monthDay);
+			final String datenow;
+			
+			if (t.hour <= 5) {
+				//search for the routes along the same service
+				timenow = String.format("%02d%02d%02d", t.hour+24,t.minute,t.second);
+				Calendar cal = Calendar.getInstance();
+				cal.set(t.year, t.month, t.monthDay);
+				cal.add(Calendar.DAY_OF_MONTH, -1);
+				//Date yesterday = cal.getTime();
+				datenow = String.format("%04d%02d%02d", cal.get(Calendar.YEAR), 
+						cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH));
+			}
+			else {
+				timenow = String.format("%02d%02d%02d", t.hour,t.minute,t.second);
+				datenow = String.format("%04d%02d%02d", t.year, t.month+1, t.monthDay);
+			}
+			
 			// Make sure we actually have some valid data, since schedules change often.
 			if (!mCalendarChecked) {
 				mCalendarOK = CheckCalendar(datenow);
@@ -168,6 +179,7 @@ public class TimesActivity extends ListActivity {
 			if (mTrip_id == null) {
 				// showing all routes
 				ServiceCalendar aSC = new ServiceCalendar(mDBName, mDB, ampmflag);
+				aSC.setContext(mContext);
 				mListDetails = aSC.getRouteDepartureTimes(mStop_id, datenow,
 						showAllTrips, mDB);
 			} else {
@@ -184,6 +196,7 @@ public class TimesActivity extends ListActivity {
 					// showing all routes
 					csr.close();
 					ServiceCalendar aSC = new ServiceCalendar(mDBName, mDB, ampmflag);
+					aSC.setContext(mContext);
 					mListDetails = aSC.getRouteDepartureTimes(mStop_id, datenow,
 							showAllTrips, mDB);
 					
@@ -193,6 +206,7 @@ public class TimesActivity extends ListActivity {
 					csr.close();
 					// showing just one route
 					ServiceCalendar aSC = new ServiceCalendar(mDBName, mDB, ampmflag);
+					aSC.setContext(mContext);
 					mListDetails = aSC.getRouteDepartureTimes(mStop_id, mRoute_id, mHeadsign, datenow,
 							showAllTrips, mDB);
 				}
@@ -262,9 +276,14 @@ public class TimesActivity extends ListActivity {
 				final Time t = new Time();
 				t.setToNow();
 
+				int curhour = t.hour;
+				if (curhour <= 6) {
+					curhour += 24;
+				}
+				
 				final String nextdeparture = mListDetails.get(savedpos)[0];
 				int hourdiff = Integer.parseInt(nextdeparture.substring(0, 2));
-				hourdiff -= t.hour;
+				hourdiff -= curhour;
 				hourdiff *= 60;
 				int mindiff = Integer.parseInt(nextdeparture.substring(2, 4));
 				mindiff -= t.minute;

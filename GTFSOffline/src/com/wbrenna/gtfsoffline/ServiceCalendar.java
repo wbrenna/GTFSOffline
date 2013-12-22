@@ -22,15 +22,19 @@
 package com.wbrenna.gtfsoffline;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.format.Time;
 import android.util.Log;
 import android.util.TimeFormatException;
+import android.widget.Toast;
 
 public class ServiceCalendar {
 	private static final String TAG = "ServiceCalendar";
@@ -51,6 +55,7 @@ public class ServiceCalendar {
 	private DatabaseHelper mDatabaseHelper;
 	private boolean ampm;
 	private final int hoursLookAhead = 1;
+	private Context mContext;
 	
 	public ServiceCalendar(String aDBName, SQLiteDatabase aDB, boolean ampmflag) {
 		// Log.v(TAG, "ServiceCalendar()");
@@ -66,6 +71,10 @@ public class ServiceCalendar {
 
 	}
 
+	public void setContext(Context aContext) {
+		mContext = aContext;
+	}
+	
 	public void setDB(DatabaseHelper aDatabaseHelper) {
 		mDatabaseHelper = aDatabaseHelper;
 	}
@@ -95,8 +104,10 @@ public class ServiceCalendar {
 		final String start = csr.getString(csr.getColumnIndex("start_date"));
 		final String end = csr.getString(csr.getColumnIndex("end_date"));
 		if (date.compareTo(start) < 0 || date.compareTo(end) > 0) {
-			// return "Schedule data has expired!";
-			//TODO: put a toast here alerting the user
+			//this just excludes data that isn't within our date range.
+			//note that it doesn't mean the entire dataset is expired
+			//the entire dataset expiry will return no results...
+			//basically, need to watch RSS to get the right datasets.
 			return null;
 		}
 
@@ -205,22 +216,35 @@ public class ServiceCalendar {
 		final String timenow;
 		final String timelimit;
 		String q;
+		String date;
 
-		//add one minute to prevent negative-one minute errors
-		timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
 
-		if (t.hour+hoursLookAhead >= 24) {
-			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead-24,t.minute,t.second);
-			q = "select distinct trip_id,departure_time from stop_times where stop_id = ? and (departure_time >= ? or departure_time <= ?)";
+		if (t.hour <= 5) {
+			//add one minute to prevent negative-one minute errors
+			timenow = String.format("%02d%02d%02d", t.hour+24, t.minute+1, t.second);
+
+			//search for the routes along the same service
+			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead+24,t.minute,t.second);
+			q = "select distinct trip_id,departure_time from stop_times where stop_id = ? and (departure_time >= ? and departure_time <= ?)";
+			Calendar cal = Calendar.getInstance();
+			cal.set(t.year, t.month, t.monthDay);
+			cal.add(Calendar.DAY_OF_MONTH, -1);
+			//Date yesterday = cal.getTime();
+			date = String.format("%04d%02d%02d", cal.get(Calendar.YEAR), 
+					cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH));
 		}
 		else {
+			//add one minute to prevent negative-one minute errors
+			timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
+
 			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead,t.minute,t.second);
 			q = "select distinct trip_id,departure_time from stop_times where stop_id = ? and departure_time >= ? and departure_time <= ?";
+			date = String.format("%04d%02d%02d", t.year, t.month+1, t.monthDay);
 		}
 
 		//TODO: need to use the date as previous day for correct weekend service, etc.
 		//this could be handled earlier in holiday days etc.
-		final String date = String.format("%04d%02d%02d", t.year, t.month, t.monthDay);
+		
 		
 //		final ArrayList<String[]> listdetails = getRouteDepartureTimes(stopid, date, true, null);
 //we will need to significantly optimize this - first of all, we don't want to get ALL route departure times!
@@ -317,24 +341,34 @@ public class ServiceCalendar {
 		final String timenow;
 		final String timelimit;
 		String q;
+		String date;
 
-		timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
-
-		if (t.hour + hoursLookAhead >= 24) {
-			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead-24,t.minute,t.second);
-			q = "select trip_id,departure_time from stop_times where stop_id = ? and (departure_time >= ? or departure_time <= ?)"
+		
+		if (t.hour <= 5) {
+			timenow = String.format("%02d%02d%02d", t.hour+24, t.minute+1, t.second);
+			//search for the routes along the same service
+			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead+24,t.minute,t.second);
+			q = "select trip_id,departure_time from stop_times where stop_id = ? and departure_time >= ? and departure_time <= ?"
 					+ "join trips on trip_id = ? where trip_headsign = ?";
-
+			Calendar cal = Calendar.getInstance();
+			cal.set(t.year, t.month, t.monthDay);
+			cal.add(Calendar.DAY_OF_MONTH, -1);
+			//Date yesterday = cal.getTime();
+			date = String.format("%04d%02d%02d", cal.get(Calendar.YEAR), 
+					cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH));
 		}
 		else {
-			//add one minute to prevent negative-one minute errors
+			timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
 			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead,t.minute,t.second);
 			q = "select trip_id,departure_time from stop_times where stop_id = ? and departure_time >= ? and departure_time <= ?"
 					+ "join trips on trip_id = ? where trip_headsign = ?";
-
+			//Months are [0-11]! Weird, right?
+			date = String.format("%04d%02d%02d", t.year, t.month+1, t.monthDay);
 		}
-		//TODO: Why is the month incremented here?
-		final String date = String.format("%04d%02d%02d", t.year, t.month + 1, t.monthDay);
+
+		//TODO: need to use the date as previous day for correct weekend service, etc.
+		//this could be handled earlier in holiday days etc.
+		
 		
 		final String[] selectargs = new String[] { stopid, timenow, timelimit, routeid, headsign };
 		final Cursor csr = mDatabaseHelper.ReadableDB(mDBName, mDB).rawQuery(q, selectargs);
@@ -342,7 +376,7 @@ public class ServiceCalendar {
 		// Load the array for the list
 		final int maxcount = csr.getCount();
 		final ArrayList<String[]> listdetails = new ArrayList<String[]>(maxcount);
-		final ArrayList<String[]> results = new ArrayList<String[]>(maxResults);
+		//final ArrayList<String[]> results = new ArrayList<String[]>(maxResults);
 		
 		boolean more = csr.moveToFirst();
 		while (more) {
@@ -373,7 +407,7 @@ public class ServiceCalendar {
 		}
 		else
 		{
-			// No more busses today.
+			// No more buses today.
 			return null;
 		}
 	}
@@ -569,5 +603,107 @@ public class ServiceCalendar {
 		}
 		*/
 
+	}
+	
+	public String formattedDepartureTime(Time t, String hours, String minutes)
+	{
+		String departsIn;
+		int hourdiff = Integer.parseInt(hours)-t.hour;
+
+		while (hourdiff >= 24) {
+			hourdiff = hourdiff - 24;
+		}
+		
+		//TODO: fix this for the merge case where we want to find tomorrow morning's
+		//buses or the previous buses.
+		
+		//cover the case of when we are late (23.00) and the bus is early (04.00)
+		//note that this shouldn't happen while we're finding buses _for today_ only.
+		if(hourdiff < 0) {
+			hourdiff = hourdiff + 24;
+		}
+		
+		int minutesdiff = Integer.parseInt(minutes)-t.minute;
+		
+		int totaldiff = hourdiff*60 + minutesdiff;
+		
+		if (totaldiff == minutesdiff) {	
+			if (minutesdiff == 1) {
+				departsIn = "Departs in "
+							+ minutesdiff 
+							+ " minute";
+			}
+			else {
+				departsIn = "Departs in "
+							+ minutesdiff
+							+ " minutes";
+			}
+		}
+		else if (totaldiff-hourdiff*60 <= 0) {
+			//we have negative minutes
+			if (minutesdiff == 1) {
+				if (totaldiff/60 == 1) {
+					departsIn = "Departs in " + totaldiff/60 + " hour and " +
+							+ totaldiff%60
+							+ " minute";
+				}
+				else {
+					departsIn = "Departs in " + totaldiff/60 + " hours and " +
+							+ totaldiff%60
+							+ " minute";
+				}
+			}
+			else {
+				if (totaldiff/60 == 1) {
+					departsIn = "Departs in " + totaldiff/60 + " hour " +
+							+ totaldiff%60
+							+ " minutes";
+				}
+				else {
+					departsIn = "Departs in " + totaldiff/60 + " hours " +
+							+ totaldiff%60
+							+ " minutes";
+				}
+			}
+		}
+		else {
+			if ( hourdiff == 1) {
+				if (minutesdiff == 1) {
+					departsIn = "Departs in " + hourdiff + " hour and " +
+								+ minutesdiff 
+								+ " minute";
+				}
+				else {
+					departsIn = "Departs in " + hourdiff + " hour " +
+								+ minutesdiff
+								+ " minutes";
+				}
+			}
+			else if ( hourdiff == 0) {
+				if (minutesdiff == 1) {
+					departsIn = "Departs in " 
+								+ minutesdiff 
+								+ " minute";
+				}
+				else {
+					departsIn = "Departs in "
+								+ minutesdiff
+								+ " minutes";
+				}
+			}
+			else {
+				if (minutesdiff == 1) {
+					departsIn = "Departs in " + hourdiff + " hours and " +
+								+ minutesdiff 
+								+ " minute";
+				}
+				else {
+					departsIn = "Departs in " + hourdiff + " hours " +
+								+ minutesdiff
+								+ " minutes";
+				}
+			}
+		}
+		return departsIn;
 	}
 }

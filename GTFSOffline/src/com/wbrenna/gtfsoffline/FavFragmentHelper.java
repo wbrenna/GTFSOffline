@@ -177,20 +177,11 @@ public class FavFragmentHelper {
 						//process str[0] to get the right departure time
 						final String hours = str[0].substring(0,2);
 						final String minutes = str[0].substring(2,4);
-						String departsIn;
-						if( (Integer.parseInt(hours) - t.hour) == 0 ) {
-							departsIn = "Departs in " 
-									+ Integer.toString(Integer.parseInt(minutes) - t.minute) 
-									+ " minutes";
-						}
-						else {
-							//just use the remainder since our we only look for trips within the hour
-							departsIn = "Departs in "
-										+ Integer.toString(60 + Integer.parseInt(minutes) - t.minute) 
-										+ " minutes";
-						}
+						//String departsIn;
+			
 						//Log.e(TAG, "Adding to list: " + s.stop_name);
-						mListDetails.add(new String[] { "", s.stop_id, s.stop_name, str[4], departsIn, str[2] });
+						mListDetails.add(new String[] { "", s.stop_id, s.stop_name, str[4], 
+								myBusService.formattedDepartureTime(t, hours, minutes), str[2] });
 					}
 				}
 				//close the database
