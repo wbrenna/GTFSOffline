@@ -25,7 +25,6 @@ import java.util.Calendar;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -95,13 +94,6 @@ public class TimesActivity extends ListActivity {
 	protected void onResume() {
 		super.onResume();
 
-		// See if we need to recalculate and redraw the screen.
-		// This happens if the user brings up the preferences screen.
-		//if (PrefChanged) {
-		//	new ProcessBusTimes().execute();
-		//	PrefChanged = false;
-		//}
-		
 		//assuming that this only happens when we _need_ to redraw
 		//so, reload shared preferences and execute
 		showAllTrips = mPrefs.getBoolean(mContext.getString(R.string.pref_showallbusses_key), false);
@@ -201,7 +193,7 @@ public class TimesActivity extends ListActivity {
 							showAllTrips, mDB);
 					
 				} else {
-					Log.e(TAG,"Entered specific search.");
+					//Log.e(TAG,"Entered specific search.");
 					mRoute_id = csr.getString(0);
 					csr.close();
 					// showing just one route

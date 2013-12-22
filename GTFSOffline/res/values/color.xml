@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="grt_blue">#E40040E0</color>
+    <color name="grt_dark_blue">#E4003ACA</color>
     <color name="grt_yellow">#E4EAB510</color>
     <color name="list_background">#FFA7B7E0</color>
     <color name="list_dark_background">#FF90A7E0</color>

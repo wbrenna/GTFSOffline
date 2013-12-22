@@ -23,13 +23,8 @@
 package com.wbrenna.gtfsoffline;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import android.app.ListActivity;
-import android.text.Html;
-import android.text.util.Linkify;
-import android.text.util.Linkify.TransformFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

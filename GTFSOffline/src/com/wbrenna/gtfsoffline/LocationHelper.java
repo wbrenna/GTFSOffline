@@ -20,19 +20,10 @@
 
 package com.wbrenna.gtfsoffline;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.text.format.Time;
 import android.util.Log;
 import android.widget.Toast;
 

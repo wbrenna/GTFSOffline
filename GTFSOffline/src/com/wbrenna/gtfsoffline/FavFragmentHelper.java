@@ -21,16 +21,12 @@
 package com.wbrenna.gtfsoffline;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -38,6 +34,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class FavFragmentHelper {
@@ -48,7 +45,7 @@ public class FavFragmentHelper {
 	private static int NUM_CLOSEST_STOPS;
 	private static int NUM_BUSES;	//the number of next buses per stop to be shown.
 
-	private Location mLocation;
+	//private Location mLocation;
 	private timestopdescArrayAdapter mAdapter;
 	private ArrayList<String[]> mListDetails;
 
@@ -65,10 +62,12 @@ public class FavFragmentHelper {
 	private SharedPreferences mPrefs;
 	private boolean ampmflag;
 	private String[] mActiveDB;
+	private int hoursLookAhead;
+	private ProgressBar mProgress;
 	
 
 
-	public FavFragmentHelper(Context context, String[] activeDBs) {
+	public FavFragmentHelper(Context context, String[] activeDBs, ProgressBar aProgress) {
 		mContext = context;
 	
 		mDatabaseHelper = new DatabaseHelper(mContext);
@@ -76,20 +75,20 @@ public class FavFragmentHelper {
 		
 		// Load animations used to show/hide progress bar
 		//mTitle = (TextView) findViewById(R.id.listtitle);
+		mProgress = aProgress;
 		mListDetails = new ArrayList<String[]>(NUM_CLOSEST_STOPS*NUM_BUSES);
 
 		//mTitle.setText(R.string.loading_stops);
 		mStops = null;
-		mLocation = null;
+		//mLocation = null;
 		
 		//set up prefs
 		FAVSTOPS_KEY = new String(mContext.getString(R.string.pref_favstops_key));
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		reloadPreferences();
 	}
-	
-	public void runProcessOnLocation(Location aLocation) {
-		mLocation = aLocation;
+
+	public void runProcess() {
 		new ProcessBusStops().execute();
 	}
 
@@ -99,6 +98,8 @@ public class FavFragmentHelper {
 											mContext.getString(R.string.pref_num_closest_stops), "8"));
 		NUM_BUSES = Integer.parseInt(mPrefs.getString(
 								mContext.getString(R.string.pref_num_buses_per_stop), "3"));
+		hoursLookAhead = Integer.parseInt(mPrefs.getString(
+					mContext.getString(R.string.pref_hours_look_ahead), "1"));
 	}
 
 	public ArrayList<String[]> retrieveNextBusList() {
@@ -117,14 +118,14 @@ public class FavFragmentHelper {
 		@Override
 		protected void onPreExecute() {
 //			mListDetail.startAnimation(mSlideIn);
-//			mProgress.setVisibility(View.VISIBLE);
+			mProgress.setVisibility(View.VISIBLE);
 		}
 
 		// Update the progress bar.
 		// 	- do nothing for now
 		@Override
 		protected void onProgressUpdate(Integer... parms) {
-//			mProgress.setProgress(parms[0]);
+			mProgress.setProgress(parms[0]);
 		}
 
 		@Override
@@ -161,7 +162,7 @@ public class FavFragmentHelper {
 					ServiceCalendar myBusService = new ServiceCalendar(myDBName, myDB, ampmflag);
 					myBusService.setDB(mDatabaseHelper);
 					final ArrayList<String[]> fullResults = myBusService.getNextDepartureTimes(
-								s.stop_id, NUM_BUSES);
+								s.stop_id, NUM_BUSES, hoursLookAhead);
 					//the format of this:
 					// departuretime	runstoday	trip_id		route_short_name	trip_headsign
 					//	140300				1		34867		13					Route 13 Laurelwood
@@ -183,6 +184,7 @@ public class FavFragmentHelper {
 						mListDetails.add(new String[] { "", s.stop_id, s.stop_name, str[4], 
 								myBusService.formattedDepartureTime(t, hours, minutes), str[2] });
 					}
+					publishProgress(((int) ((i / (float) mStops.length) * 100)));
 				}
 				//close the database
 				mDatabaseHelper.CloseDB(myDB);
@@ -194,7 +196,7 @@ public class FavFragmentHelper {
 		protected void onPostExecute(Void foo) {
 			// Log.v(TAG, "onPostExecute()");
 
-			//mProgress.setVisibility(View.INVISIBLE);
+			mProgress.setVisibility(View.INVISIBLE);
 			//mListDetail.startAnimation(mSlideOut);
 
 			//mTitle.setText(R.string.title_activity_closest_stops);

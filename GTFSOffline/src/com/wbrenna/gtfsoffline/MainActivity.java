@@ -47,7 +47,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements
@@ -81,6 +81,7 @@ public class MainActivity extends FragmentActivity implements
 	
 	public static Location mLocation = null;
 	public static LocationListener locationListener = null;
+	public static ProgressBar mProgress = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +93,8 @@ public class MainActivity extends FragmentActivity implements
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
+		mProgress = (ProgressBar) findViewById(R.id.progress);
+		
 		//read in the preferences
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		
@@ -140,7 +143,8 @@ public class MainActivity extends FragmentActivity implements
 						mSectionsPagerAdapter.notifyDataSetChanged();
 						
 					} else {
-						Toast.makeText(getBaseContext(), R.string.last_location_fix, Toast.LENGTH_LONG).show();
+						Toast.makeText(getBaseContext(), R.string.last_location_fix, 
+								Toast.LENGTH_LONG).show();
 						//Log.e(TAG, "No more location fixes ");
 					}
 				}
@@ -301,7 +305,7 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onTabUnselected(ActionBar.Tab tab,
 			FragmentTransaction fragmentTransaction) {
-		//we want to turn off location management
+		//we want to turn off location management?
 		//mSectionsPagerAdapter.notifyDataSetChanged();
 	}
 
@@ -333,7 +337,8 @@ public class MainActivity extends FragmentActivity implements
 				return fragment;
 			}
 			else {
-				Fragment fragment = new DBListFragment(mDBActive[position-1]);
+				//Fragment fragment = new DBListFragment(mDBActive[position-1]);
+				Fragment fragment = new DBListFragment();
 				Bundle args = new Bundle();
 				args.putString(DBListFragment.DATABASE, mDBActive[position-1]);
 				fragment.setArguments(args);
@@ -409,12 +414,12 @@ public class MainActivity extends FragmentActivity implements
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
 		private FavFragmentHelper mFavFragHelper;
-		private String myDatabaseName;
+		//private String myDatabaseName;
 		private timestopdescArrayAdapter mListAdapter;
 		
 		
-		public FavSectionFragment() {
-		}
+//		public FavSectionFragment() {
+//		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -435,9 +440,10 @@ public class MainActivity extends FragmentActivity implements
 		public void onActivityCreated(Bundle savedInstanceState) {
 			super.onActivityCreated(savedInstanceState);
 			
-			mFavFragHelper = new FavFragmentHelper(this.getActivity(), mDBActive);
+			mFavFragHelper = new FavFragmentHelper(this.getActivity(), 
+					mDBActive, mProgress);
 			//setup the list adapter
-			mFavFragHelper.runProcessOnLocation(mLocation);
+			mFavFragHelper.runProcess();
 			mListAdapter = new timestopdescArrayAdapter(this.getActivity(), R.layout.favstopdesc, 
 							mFavFragHelper.retrieveNextBusList());
 			
@@ -463,14 +469,9 @@ public class MainActivity extends FragmentActivity implements
 		 * fragment.
 		 */
 		private static final String DATABASE = "DBPlaceholder";
+		public String myDatabase;
 		private LocationFragmentHelper mLocationFragHelper;
-		private String myDatabaseName;
 		private timestopdescArrayAdapter mListAdapter;
-
-		private DBListFragment(String dbName) {
-			myDatabaseName = dbName;
-			//mLocationManager = aLocationManager;
-		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -485,13 +486,18 @@ public class MainActivity extends FragmentActivity implements
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			setRetainInstance(true);
+			
+			//set our database
+			myDatabase = getArguments().getString(DATABASE);
+			
 		}
 		
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			super.onActivityCreated(savedInstanceState);
 			
-			mLocationFragHelper = new LocationFragmentHelper(this.getActivity(), myDatabaseName, null);
+			mLocationFragHelper = new LocationFragmentHelper(this.getActivity(), 
+					myDatabase, null, mProgress);
 			//setup the list adapter
 			mLocationFragHelper.runProcessOnLocation(mLocation);
 			mListAdapter = new timestopdescArrayAdapter(this.getActivity(), R.layout.timestopdesc, 
@@ -530,7 +536,7 @@ public class MainActivity extends FragmentActivity implements
 			routes.putExtra(pkgstr + ".stop_name", stop_name);
 			routes.putExtra(pkgstr + ".trip_id", trip_id);
 			routes.putExtra(pkgstr + ".headsign", headsign);
-			routes.putExtra(pkgstr + ".db_name", myDatabaseName);
+			routes.putExtra(pkgstr + ".db_name", myDatabase);
 			this.getActivity().startActivity(routes);
 		}
 		

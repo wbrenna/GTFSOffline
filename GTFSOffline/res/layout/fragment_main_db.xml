@@ -9,18 +9,21 @@
     tools:context=".MainActivity$DBSectionFragment"
     android:background="@color/list_dark_background"
     >
-
+    
     <TextView
         android:id="@+id/section_label2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
 
     <LinearLayout
         android:id="@+id/detail_area"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical" >
-
+           
+        
+        
         <ListView
             android:id="@android:id/list"
             style="@style/List.Body"
@@ -28,6 +31,7 @@
             android:layout_height="fill_parent"
             android:scrollbarStyle="outsideInset"  />
         
+
     </LinearLayout>   
     
 </RelativeLayout>

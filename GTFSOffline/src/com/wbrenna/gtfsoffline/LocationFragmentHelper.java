@@ -38,6 +38,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class LocationFragmentHelper {
@@ -66,11 +67,15 @@ public class LocationFragmentHelper {
 	}
 	private StopLocn[] mStops;
 	private SharedPreferences mPrefs;
-	private boolean ampmflag;
+	private static boolean ampmflag;
+	private static int hoursLookAhead;
+	
+	private ProgressBar mProgress;
 	
 
 
-	public LocationFragmentHelper(Context context, String aDBName, SQLiteDatabase aDB) {
+	public LocationFragmentHelper(Context context, String aDBName, 
+				SQLiteDatabase aDB, ProgressBar aProgress) {
 		mContext = context;
 		myDBName = aDBName;
 		myDB = aDB;
@@ -79,6 +84,7 @@ public class LocationFragmentHelper {
 		
 		// Load animations used to show/hide progress bar
 		//mTitle = (TextView) findViewById(R.id.listtitle);
+		mProgress = aProgress;
 		mListDetails = new ArrayList<String[]>(NUM_CLOSEST_STOPS*NUM_BUSES);
 
 		//mTitle.setText(R.string.loading_stops);
@@ -101,6 +107,8 @@ public class LocationFragmentHelper {
 											mContext.getString(R.string.pref_num_closest_stops), "8"));
 		NUM_BUSES = Integer.parseInt(mPrefs.getString(
 								mContext.getString(R.string.pref_num_buses_per_stop), "3"));
+		hoursLookAhead = Integer.parseInt(mPrefs.getString(
+					mContext.getString(R.string.pref_hours_look_ahead), "1"));
 	}
 
 	public ArrayList<String[]> retrieveNextBusList() {
@@ -119,14 +127,13 @@ public class LocationFragmentHelper {
 		@Override
 		protected void onPreExecute() {
 //			mListDetail.startAnimation(mSlideIn);
-//			mProgress.setVisibility(View.VISIBLE);
+			mProgress.setVisibility(View.VISIBLE);	
 		}
 
 		// Update the progress bar.
-		// 	- do nothing for now
 		@Override
 		protected void onProgressUpdate(Integer... parms) {
-//			mProgress.setProgress(parms[0]);
+			mProgress.setProgress(parms[0]);
 		}
 
 		@Override
@@ -135,6 +142,10 @@ public class LocationFragmentHelper {
 
 			if( myDB == null ) {
 				myDB = mDatabaseHelper.ReadableDB(myDBName, myDB);
+			}
+			if (myDB == null) {
+				//we tried!
+				return null;
 			}
 			
 			final String qry = "select stop_id as _id, stop_lat, stop_lon, stop_name from stops";
@@ -158,6 +169,7 @@ public class LocationFragmentHelper {
 
 					more = csr.moveToNext();
 					++locidx;
+					//publishProgress(((int) ((locidx / (float) maxcount) * 100)));
 				}
 				csr.close();
 			}
@@ -206,7 +218,7 @@ public class LocationFragmentHelper {
 				//the next NUM_BUSES.
 				ServiceCalendar myBusService = new ServiceCalendar(myDBName, myDB, ampmflag);
 				myBusService.setDB(mDatabaseHelper);
-				final ArrayList<String[]> fullResults = myBusService.getNextDepartureTimes(s.stop_id, NUM_BUSES);
+				final ArrayList<String[]> fullResults = myBusService.getNextDepartureTimes(s.stop_id, NUM_BUSES, hoursLookAhead);
 				//the format of this:
 				// departuretime	runstoday	trip_id		route_short_name	trip_headsign
 				//	140300				1		34867		13					Route 13 Laurelwood
@@ -229,7 +241,9 @@ public class LocationFragmentHelper {
 
 					mListDetails.add(new String[] { dist, s.stop_id, s.stop_name, 
 							str[4], myBusService.formattedDepartureTime(t, hours, minutes) ,str[2]});
+					
 				}
+				publishProgress(((int) ((i / (float) stop_limit) * 100)));
 			}
 			
 			return null;
@@ -239,7 +253,7 @@ public class LocationFragmentHelper {
 		protected void onPostExecute(Void foo) {
 			// Log.v(TAG, "onPostExecute()");
 
-			//mProgress.setVisibility(View.INVISIBLE);
+			mProgress.setVisibility(View.INVISIBLE);
 			//mListDetail.startAnimation(mSlideOut);
 
 			//mTitle.setText(R.string.title_activity_closest_stops);

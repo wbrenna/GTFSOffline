@@ -25,7 +25,6 @@ package com.wbrenna.gtfsoffline;
 import java.util.ArrayList;
 
 import android.app.ListActivity;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 public class TimesArrayAdapter extends ArrayAdapter <String[]> {
-	private static final String TAG = "TimesAdapter";
+	//private static final String TAG = "TimesAdapter";
 
 	private final ArrayList<String[]> mDetails;
 	private final LayoutInflater mInflater;

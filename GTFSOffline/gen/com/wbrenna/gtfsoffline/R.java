@@ -9,20 +9,20 @@ package com.wbrenna.gtfsoffline;
 
 public final class R {
     public static final class array {
-        public static final int ClosestBusNumberStrings=0x7f050004;
-        public static final int ClosestStopNumberStrings=0x7f050003;
-        public static final int databaselist=0x7f050000;
-        public static final int databaselistvalues=0x7f050001;
-        public static final int empty_array=0x7f050002;
+        public static final int ClosestBusNumberStrings=0x7f050003;
+        public static final int ClosestStopNumberStrings=0x7f050002;
+        public static final int HoursLookAhead=0x7f050001;
+        public static final int empty_array=0x7f050000;
     }
     public static final class attr {
     }
     public static final class color {
         public static final int grt_blue=0x7f060000;
-        public static final int grt_yellow=0x7f060001;
-        public static final int list_background=0x7f060002;
-        public static final int list_dark_background=0x7f060003;
-        public static final int timer=0x7f060004;
+        public static final int grt_dark_blue=0x7f060001;
+        public static final int grt_yellow=0x7f060002;
+        public static final int list_background=0x7f060003;
+        public static final int list_dark_background=0x7f060004;
+        public static final int timer=0x7f060005;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -36,25 +36,27 @@ public final class R {
     }
     public static final class drawable {
         public static final int ic_launcher=0x7f020000;
-        public static final int routenumber=0x7f020001;
-        public static final int stopnumber=0x7f020002;
+        public static final int progress_horizontal=0x7f020001;
+        public static final int routenumber=0x7f020002;
+        public static final int stopnumber=0x7f020003;
     }
     public static final class id {
-        public static final int action_settings=0x7f0b000e;
-        public static final int departsin=0x7f0b0005;
-        public static final int desc=0x7f0b000a;
-        public static final int detail_area=0x7f0b0008;
-        public static final int label=0x7f0b0002;
-        public static final int listtitle=0x7f0b000d;
+        public static final int action_settings=0x7f0b000f;
+        public static final int departsin=0x7f0b0006;
+        public static final int desc=0x7f0b000b;
+        public static final int detail_area=0x7f0b0009;
+        public static final int label=0x7f0b0003;
+        public static final int listtitle=0x7f0b000e;
         public static final int pager=0x7f0b0000;
-        public static final int routedesc=0x7f0b000c;
-        public static final int routelabel=0x7f0b000b;
-        public static final int section_label=0x7f0b0009;
-        public static final int section_label2=0x7f0b0007;
-        public static final int stoptime=0x7f0b0001;
-        public static final int trip_id=0x7f0b0006;
-        public static final int tripheader=0x7f0b0004;
-        public static final int value=0x7f0b0003;
+        public static final int progress=0x7f0b0001;
+        public static final int routedesc=0x7f0b000d;
+        public static final int routelabel=0x7f0b000c;
+        public static final int section_label=0x7f0b000a;
+        public static final int section_label2=0x7f0b0008;
+        public static final int stoptime=0x7f0b0002;
+        public static final int trip_id=0x7f0b0007;
+        public static final int tripheader=0x7f0b0005;
+        public static final int value=0x7f0b0004;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -70,78 +72,81 @@ public final class R {
         public static final int main=0x7f0a0000;
     }
     public static final class string {
-        public static final int about=0x7f08000c;
+        public static final int about=0x7f08000f;
         public static final int action_settings=0x7f080001;
-        public static final int ampmtimes=0x7f08000d;
-        public static final int app_credits=0x7f08000f;
-        public static final int app_description=0x7f08000e;
+        public static final int ampmtimes=0x7f080010;
+        public static final int app_credits=0x7f080012;
+        public static final int app_description=0x7f080011;
         public static final int app_name=0x7f080000;
-        public static final int app_short_name=0x7f080010;
-        public static final int auto_check4dbupdate=0x7f080011;
-        public static final int button_routes=0x7f080012;
-        public static final int button_stops=0x7f080013;
-        public static final int calendar_expired=0x7f080014;
-        public static final int cancel=0x7f080015;
-        public static final int closest_stops=0x7f080016;
-        public static final int cntinue=0x7f080017;
-        public static final int corrupt_exit=0x7f080018;
-        public static final int db_download_now=0x7f08001a;
-        public static final int db_downloading=0x7f08001b;
-        public static final int db_is_awol=0x7f080019;
-        public static final int db_is_corrupt=0x7f08001c;
-        public static final int db_new_avail=0x7f08001d;
-        public static final int db_not_avail=0x7f08001e;
-        public static final int db_opening=0x7f08001f;
+        public static final int app_short_name=0x7f080013;
+        public static final int auto_check4dbupdate=0x7f080014;
+        public static final int button_routes=0x7f080015;
+        public static final int button_stops=0x7f080016;
+        public static final int calendar_expired=0x7f080017;
+        public static final int cancel=0x7f080018;
+        public static final int closest_stops=0x7f080019;
+        public static final int cntinue=0x7f08001a;
+        public static final int corrupt_exit=0x7f08001b;
+        public static final int db_download_now=0x7f08001d;
+        public static final int db_downloading=0x7f08001e;
+        public static final int db_is_awol=0x7f08001c;
+        public static final int db_is_corrupt=0x7f08001f;
+        public static final int db_new_avail=0x7f080020;
+        public static final int db_not_avail=0x7f080021;
+        public static final int db_opening=0x7f080022;
+        public static final int default_hours_look_ahead=0x7f08000e;
         public static final int default_num_buses_per_stop=0x7f08000b;
         public static final int default_num_closest_stops=0x7f08000a;
-        public static final int exit=0x7f080020;
+        public static final int exit=0x7f080023;
         public static final int favs=0x7f080002;
-        public static final int favs_add_to_list=0x7f080021;
-        public static final int favs_remove_from_list=0x7f080022;
-        public static final int favs_reorder_item=0x7f080023;
-        public static final int find_route=0x7f080024;
-        public static final int find_stop=0x7f080025;
-        public static final int last_location_fix=0x7f080026;
-        public static final int legal_notices=0x7f080027;
-        public static final int loading_routes=0x7f080028;
-        public static final int loading_stops=0x7f080029;
-        public static final int loading_times=0x7f08002a;
-        public static final int longpress_adds_stop=0x7f08002b;
-        public static final int longpress_removes_stop=0x7f08002c;
-        public static final int menu_settings=0x7f08002d;
-        public static final int mylocation=0x7f08002e;
-        public static final int no=0x7f08002f;
-        public static final int no_favourites=0x7f080030;
-        public static final int no_location_fix=0x7f080031;
-        public static final int no_more_busses=0x7f080032;
+        public static final int favs_add_to_list=0x7f080024;
+        public static final int favs_remove_from_list=0x7f080025;
+        public static final int favs_reorder_item=0x7f080026;
+        public static final int find_route=0x7f080027;
+        public static final int find_stop=0x7f080028;
+        public static final int last_location_fix=0x7f080029;
+        public static final int legal_notices=0x7f08002a;
+        public static final int loading_routes=0x7f08002b;
+        public static final int loading_stops=0x7f08002c;
+        public static final int loading_times=0x7f08002d;
+        public static final int longpress_adds_stop=0x7f08002e;
+        public static final int longpress_removes_stop=0x7f08002f;
+        public static final int menu_settings=0x7f080030;
+        public static final int mylocation=0x7f080031;
+        public static final int no=0x7f080032;
+        public static final int no_favourites=0x7f080033;
+        public static final int no_location_fix=0x7f080034;
+        public static final int no_more_busses=0x7f080035;
         public static final int num_buses_per_stop=0x7f080009;
         public static final int num_closest_stops=0x7f080007;
-        public static final int pref_ampmtimes_key=0x7f080034;
-        public static final int pref_db_autoupdate_key=0x7f080035;
+        public static final int num_hours_look_ahead=0x7f08000d;
+        public static final int pref_ampmtimes_key=0x7f080037;
+        public static final int pref_db_autoupdate_key=0x7f080038;
         public static final int pref_dbs=0x7f080004;
-        public static final int pref_favstops_key=0x7f080036;
+        public static final int pref_favstops_key=0x7f080039;
+        public static final int pref_hours_look_ahead=0x7f08000c;
         public static final int pref_num_buses_per_stop=0x7f080008;
         public static final int pref_num_closest_stops=0x7f080006;
-        public static final int pref_showallbusses_key=0x7f080037;
-        public static final int pref_uuid_key=0x7f080038;
-        public static final int preferences=0x7f080033;
-        public static final int refresh=0x7f080039;
-        public static final int rider_alerts=0x7f08003a;
-        public static final int route_fling=0x7f08003b;
+        public static final int pref_showallbusses_key=0x7f08003a;
+        public static final int pref_uuid_key=0x7f08003b;
+        public static final int preferences=0x7f080036;
+        public static final int refresh=0x7f08003c;
+        public static final int rider_alerts=0x7f08003d;
+        public static final int route_fling=0x7f08003e;
         public static final int routestitle=0x7f080003;
-        public static final int search_hint=0x7f08003c;
-        public static final int showallbusses=0x7f08003d;
-        public static final int showmap=0x7f08003e;
-        public static final int stop_unused=0x7f08003f;
-        public static final int tap_time_for_route=0x7f080040;
-        public static final int tap_time_for_trip=0x7f080041;
-        public static final int title_activity_closest_stops=0x7f080042;
-        public static final int title_favourites=0x7f080043;
-        public static final int title_mapstops=0x7f080044;
-        public static final int title_rider_alerts=0x7f080045;
-        public static final int title_search=0x7f080046;
+        public static final int search_hint=0x7f08003f;
+        public static final int showallbusses=0x7f080040;
+        public static final int showmap=0x7f080041;
+        public static final int stop_unused=0x7f080042;
+        public static final int tap_time_for_route=0x7f080043;
+        public static final int tap_time_for_trip=0x7f080044;
+        public static final int title_activity_closest_stops=0x7f080045;
+        public static final int title_favourites=0x7f080046;
+        public static final int title_mapstops=0x7f080047;
+        public static final int title_rider_alerts=0x7f080048;
+        public static final int title_search=0x7f080049;
         public static final int use_dbs=0x7f080005;
-        public static final int yes=0x7f080047;
+        public static final int yes=0x7f08004a;
     }
     public static final class style {
         /** 

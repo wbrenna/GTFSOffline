@@ -11,6 +11,12 @@
         android:title="@string/ampmtimes" />
     
     
+    <ListPreference
+        android:defaultValue="@string/default_hours_look_ahead"
+        android:key="@string/pref_hours_look_ahead"
+        android:entryValues="@array/HoursLookAhead"
+        android:entries="@array/HoursLookAhead"
+        android:title="@string/num_hours_look_ahead" />
     
     
     <ListPreference

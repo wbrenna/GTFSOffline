@@ -25,9 +25,6 @@
 package com.wbrenna.gtfsoffline;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import android.app.ListActivity;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +33,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 public class timestopdescArrayAdapter extends ArrayAdapter <String[]> /*<ArrayList<String[]>>*/ {
-	private static final String TAG = "timestopdescAdapter";
+	//private static final String TAG = "timestopdescAdapter";
 
 	private final ArrayList<String[]> mDetails;
 	private final LayoutInflater mInflater;

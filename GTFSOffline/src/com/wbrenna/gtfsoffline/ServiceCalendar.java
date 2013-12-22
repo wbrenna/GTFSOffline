@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 
 import android.content.Context;
@@ -34,7 +33,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.format.Time;
 import android.util.Log;
 import android.util.TimeFormatException;
-import android.widget.Toast;
 
 public class ServiceCalendar {
 	private static final String TAG = "ServiceCalendar";
@@ -53,9 +51,8 @@ public class ServiceCalendar {
 	private SQLiteDatabase mDB = null;
 	private String mDBName;
 	private DatabaseHelper mDatabaseHelper;
-	private boolean ampm;
-	private final int hoursLookAhead = 1;
-	private Context mContext;
+	//private boolean ampm;
+	//private Context mContext;
 	
 	public ServiceCalendar(String aDBName, SQLiteDatabase aDB, boolean ampmflag) {
 		// Log.v(TAG, "ServiceCalendar()");
@@ -67,12 +64,12 @@ public class ServiceCalendar {
 		trip2servicemap = new HashMap<String, String>(64);
 		
 		//mDatabaseHelper = aDatabaseHelper;
-		ampm = ampmflag;
+		//ampm = ampmflag;
 
 	}
 
 	public void setContext(Context aContext) {
-		mContext = aContext;
+		//mContext = aContext;
 	}
 	
 	public void setDB(DatabaseHelper aDatabaseHelper) {
@@ -210,7 +207,7 @@ public class ServiceCalendar {
 
 
 	/* Return the time and route details of the next bus for any route, or null if there isn't one today. */
-	public ArrayList<String[]> getNextDepartureTimes(String stopid, int maxResults) {
+	public ArrayList<String[]> getNextDepartureTimes(String stopid, int maxResults, int hoursLookAhead) {
 		final Time t = new Time();
 		t.setToNow();
 		final String timenow;
@@ -263,7 +260,7 @@ public class ServiceCalendar {
 		final Cursor csr = mDB.rawQuery(q, selectargs);
 
 		// Load the array for the list
-		final int maxcount = csr.getCount();
+		//final int maxcount = csr.getCount();
 		final ArrayList<String[]> listdetails = new ArrayList<String[]>(0);
 		final ArrayList<String[]> results = new ArrayList<String[]>(0);
 
@@ -333,7 +330,7 @@ public class ServiceCalendar {
 
 	/* Return the time of the next bus for a given route, or null if there isn't one today. */
 	public String getNextDepartureTime(String stopid, String routeid, String headsign, 
-				int maxResults) {
+				int maxResults, int hoursLookAhead) {
 
 		//final ArrayList<String[]> listdetails = getRouteDepartureTimes(stopid, routeid, headsign, date, true, null);
 		final Time t = new Time();
@@ -499,7 +496,9 @@ public class ServiceCalendar {
 		}
 		else
 		{
-			seconds = time.substring(4,6) + "s";
+			//seconds = ":" + time.substring(4,6);
+			//This is weird, we don't need to show seconds!
+			seconds = "";
 		}
 	
 		newtime = time.substring(0,2) + ":" + minutes + seconds;
@@ -565,44 +564,6 @@ public class ServiceCalendar {
 			}
 			return newtime;
 		}
-
-		// Hopefully we actually have a time
-		/*
-		if (i > 0) {
-			int inthours;
-			try {
-				inthours = Integer.parseInt(hours);
-			} catch (final NumberFormatException e) {
-				Log.d(TAG, "NumberFormatException: " + e.getMessage() + ", for time `" + newtime + "'");
-				return newtime;
-			}
-			String prefix = AM;
-
-			if (hours >= 12 && hours < 24) {
-				prefix = PM;
-				if (hours > 12) {
-					hours -= 12;
-				}
-			}
-			if (hours >= 24) {
-				if (hours == 24) {
-					hours = 12;
-				} else {
-					hours -= 24;
-				}
-			}
-
-			// Reformat to drop leading zero, add prefix
-			final int where = newtime.indexOf(" ", i); // to put the suffix
-			if (where > 0) {
-				newtime = String.format("%s%d%s%s%s", newtime.subSequence(0, i - 2), hours, newtime.substring(i, where),
-						prefix, newtime.substring(where));
-			} else { // stick it on the end
-				newtime = String.format("%s%d%s%s", newtime.subSequence(0, i - 2), hours, newtime.substring(i), prefix);
-			}
-		}
-		*/
-
 	}
 	
 	public String formattedDepartureTime(Time t, String hours, String minutes)
@@ -617,8 +578,6 @@ public class ServiceCalendar {
 		//TODO: fix this for the merge case where we want to find tomorrow morning's
 		//buses or the previous buses.
 		
-		//cover the case of when we are late (23.00) and the bus is early (04.00)
-		//note that this shouldn't happen while we're finding buses _for today_ only.
 		if(hourdiff < 0) {
 			hourdiff = hourdiff + 24;
 		}
@@ -647,6 +606,11 @@ public class ServiceCalendar {
 							+ totaldiff%60
 							+ " minute";
 				}
+				else if (totaldiff/60 == 0) {
+					departsIn = "Departs in "
+							+ totaldiff%60
+							+ " minute";
+				}
 				else {
 					departsIn = "Departs in " + totaldiff/60 + " hours and " +
 							+ totaldiff%60
@@ -656,6 +620,11 @@ public class ServiceCalendar {
 			else {
 				if (totaldiff/60 == 1) {
 					departsIn = "Departs in " + totaldiff/60 + " hour " +
+							+ totaldiff%60
+							+ " minutes";
+				}
+				else if (totaldiff/60 == 0) {
+					departsIn = "Departs in "
 							+ totaldiff%60
 							+ " minutes";
 				}
