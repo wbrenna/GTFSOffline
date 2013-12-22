@@ -55,6 +55,7 @@ public class timestopdescArrayAdapter extends ArrayAdapter <String[]> /*<ArrayLi
 		TextView tripheader; //this is the trip header
 		TextView departsin; //the time until it departs
 		TextView tripid; //a hidden trip id
+		TextView dbname; //a hidden database name so Fav knows where to search
 	}
 
 	@Override
@@ -76,6 +77,7 @@ public class timestopdescArrayAdapter extends ArrayAdapter <String[]> /*<ArrayLi
 			holder.tripheader = (TextView) view.findViewById(R.id.tripheader);
 			holder.departsin = (TextView) view.findViewById(R.id.departsin);
 			holder.tripid = (TextView) view.findViewById(R.id.trip_id);
+			holder.dbname = (TextView) view.findViewById(R.id.dbname);
 			//
 			view.setTag(holder);
 		} else {
@@ -83,8 +85,8 @@ public class timestopdescArrayAdapter extends ArrayAdapter <String[]> /*<ArrayLi
 			holder = (ViewHolder) view.getTag();
 		}
 
-		if (mDetails.size() > 0) {
-			if (mDetails.get(0).length > 5)
+		if (mDetails.size() >= position) {
+			if (mDetails.get(position).length > 6)
 			{
 				holder.stoptime.setText(mDetails.get(position)[0]);
 				holder.label.setText(mDetails.get(position)[1]);
@@ -92,6 +94,7 @@ public class timestopdescArrayAdapter extends ArrayAdapter <String[]> /*<ArrayLi
 				holder.tripheader.setText(mDetails.get(position)[3]);
 				holder.departsin.setText(mDetails.get(position)[4]);
 				holder.tripid.setText(mDetails.get(position)[5]);
+				holder.dbname.setText(mDetails.get(position)[6]);
 			}
 		}
 		

@@ -41,22 +41,23 @@ public final class R {
         public static final int stopnumber=0x7f020003;
     }
     public static final class id {
-        public static final int action_settings=0x7f0b000f;
-        public static final int departsin=0x7f0b0006;
-        public static final int desc=0x7f0b000b;
-        public static final int detail_area=0x7f0b0009;
-        public static final int label=0x7f0b0003;
-        public static final int listtitle=0x7f0b000e;
+        public static final int action_settings=0x7f0b0010;
+        public static final int dbname=0x7f0b0003;
+        public static final int departsin=0x7f0b0007;
+        public static final int desc=0x7f0b000c;
+        public static final int detail_area=0x7f0b000a;
+        public static final int label=0x7f0b0004;
+        public static final int listtitle=0x7f0b000f;
         public static final int pager=0x7f0b0000;
         public static final int progress=0x7f0b0001;
-        public static final int routedesc=0x7f0b000d;
-        public static final int routelabel=0x7f0b000c;
-        public static final int section_label=0x7f0b000a;
-        public static final int section_label2=0x7f0b0008;
+        public static final int routedesc=0x7f0b000e;
+        public static final int routelabel=0x7f0b000d;
+        public static final int section_label=0x7f0b000b;
+        public static final int section_label2=0x7f0b0009;
         public static final int stoptime=0x7f0b0002;
-        public static final int trip_id=0x7f0b0007;
-        public static final int tripheader=0x7f0b0005;
-        public static final int value=0x7f0b0004;
+        public static final int trip_id=0x7f0b0008;
+        public static final int tripheader=0x7f0b0006;
+        public static final int value=0x7f0b0005;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -180,12 +181,13 @@ public final class R {
         public static final int List_Cont1=0x7f090008;
         public static final int List_Cont2=0x7f090009;
         public static final int List_Content=0x7f090007;
+        public static final int List_DBStyle=0x7f09000c;
         public static final int List_Label=0x7f090005;
         public static final int List_Rightlabel=0x7f09000a;
-        public static final int List_RouteandStoplabel=0x7f09000d;
-        public static final int List_Routelabel=0x7f09000f;
-        public static final int List_Stopbusname=0x7f09000c;
-        public static final int List_Stoplabel=0x7f09000e;
+        public static final int List_RouteandStoplabel=0x7f09000e;
+        public static final int List_Routelabel=0x7f090010;
+        public static final int List_Stopbusname=0x7f09000d;
+        public static final int List_Stoplabel=0x7f09000f;
         public static final int List_Stoptime=0x7f09000b;
         public static final int List_Title=0x7f090004;
         public static final int Text=0x7f090002;

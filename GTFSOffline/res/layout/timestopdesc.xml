@@ -10,7 +10,9 @@
     <LinearLayout
     	style="@style/List.Content"
     	android:layout_width="wrap_content"
+    	android:minWidth="76dip"
     	android:layout_height="fill_parent"
+    	android:paddingRight="5dip"
     	android:background="@color/list_dark_background"
     	android:orientation="vertical"
 		>
@@ -55,6 +57,11 @@
 	        android:visibility="gone"
 	        style="@style/List.Rightlabel" />
 
+	    <TextView
+	        android:id="@+id/dbname"
+	        android:visibility="gone"
+	        style="@style/List.Rightlabel" />
+	    
     </LinearLayout>
     
 </LinearLayout>

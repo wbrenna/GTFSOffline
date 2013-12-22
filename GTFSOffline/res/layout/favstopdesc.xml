@@ -11,6 +11,7 @@
     	style="@style/List.Content"
     	android:layout_width="wrap_content"
     	android:layout_height="fill_parent"
+    	android:paddingRight="5dip"
     	android:background="@color/list_dark_background"
     	android:orientation="vertical"
 		>
@@ -21,6 +22,13 @@
 	        	android:gravity="center_horizontal"
 	        	android:visibility="gone" />    
 	        	
+    		<TextView
+	        	android:id="@+id/dbname"
+	        	style="@style/List.DBStyle"
+	        	android:gravity="center_horizontal"
+	        		        	 />
+    		
+    		
     		<TextView
 	        	android:id="@+id/label"
 	        	style="@style/List.Stoplabel"
@@ -55,6 +63,9 @@
 	        android:visibility="gone"
 	        style="@style/List.Rightlabel" />
 
+
+	    
+	    
     </LinearLayout>
     
 </LinearLayout>

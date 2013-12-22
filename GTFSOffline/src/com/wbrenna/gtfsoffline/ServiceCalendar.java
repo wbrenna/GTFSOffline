@@ -286,7 +286,6 @@ public class ServiceCalendar {
 		csr.close();
 		
 		//sort the results by departure time
-
 		if ( listdetails.size() > 0)
 		{
 			

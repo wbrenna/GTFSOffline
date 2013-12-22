@@ -240,7 +240,8 @@ public class LocationFragmentHelper {
 					//String departsIn;
 
 					mListDetails.add(new String[] { dist, s.stop_id, s.stop_name, 
-							str[4], myBusService.formattedDepartureTime(t, hours, minutes) ,str[2]});
+							str[4], myBusService.formattedDepartureTime(t, hours, minutes),
+							str[2], myDBName});
 					
 				}
 				publishProgress(((int) ((i / (float) stop_limit) * 100)));

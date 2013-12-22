@@ -461,6 +461,31 @@ public class MainActivity extends FragmentActivity implements
 
 		}
 		
+		public void onListItemClick(ListView lv, View v, int position, long id) {
+			Log.v(TAG, "clicked position " + position);
+
+			final String[] strs = (String[]) lv.getItemAtPosition(position);
+			if (strs == null) {
+				return;
+			}
+			final String stop_id = strs[1];
+			final String stop_name = strs[2];
+			final String headsign = strs[3];
+			final String trip_id = strs[5];
+			final String myDatabaseName = strs[6];
+			Log.v(TAG, "Found stop with ID,name,etc:" + stop_id + stop_name + trip_id);
+
+			final Intent routes = new Intent(this.getActivity(), TimesActivity.class);
+			final String pkgstr = this.getActivity().getApplicationContext().getPackageName();
+			routes.putExtra(pkgstr + ".stop_id", stop_id);
+			routes.putExtra(pkgstr + ".stop_name", stop_name);
+			routes.putExtra(pkgstr + ".trip_id", trip_id);
+			routes.putExtra(pkgstr + ".headsign", headsign);
+			routes.putExtra(pkgstr + ".db_name", myDatabaseName);
+			this.getActivity().startActivity(routes);
+		}
+		
+		
 	}
 
 	public static class DBListFragment extends ListFragment {
@@ -485,8 +510,7 @@ public class MainActivity extends FragmentActivity implements
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-			setRetainInstance(true);
-			
+			setRetainInstance(true);	
 			//set our database
 			myDatabase = getArguments().getString(DATABASE);
 			

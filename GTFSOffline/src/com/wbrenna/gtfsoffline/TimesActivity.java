@@ -106,7 +106,7 @@ public class TimesActivity extends ListActivity {
 	/* Do the processing to load the ArrayAdapter for display. */
 	//private class ProcessBusTimes extends AsyncTask<Void, Integer, Integer> implements NotificationCallback {
 	private class ProcessBusTimes extends AsyncTask<Void, Integer, Integer> {
-		static final String TAG = "ProcessBusTimesAsync";
+		//static final String TAG = "ProcessBusTimesAsync";
 
 		// TODO -- should set a listener that will call this callback.
 

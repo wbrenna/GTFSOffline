@@ -101,13 +101,22 @@
     </style>
 
     <style name="List.Stoptime">
-        <item name="android:layout_width">76sp</item>
+        <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingLeft">3dip</item>
         <item name="android:paddingRight">3dip</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
     </style>
+    
+    <style name="List.DBStyle">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">1dip</item>
+        <item name="android:paddingRight">1dip</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>    
 
     <style name="List.Stopbusname">
         <item name="android:layout_width">fill_parent</item>
@@ -118,7 +127,7 @@
     </style>
 
     <style name="List.RouteandStoplabel">
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">76dip</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">bold</item>
         <item name="android:minWidth">42sp</item>

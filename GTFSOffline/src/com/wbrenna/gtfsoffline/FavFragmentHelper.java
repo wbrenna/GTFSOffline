@@ -182,7 +182,8 @@ public class FavFragmentHelper {
 			
 						//Log.e(TAG, "Adding to list: " + s.stop_name);
 						mListDetails.add(new String[] { "", s.stop_id, s.stop_name, str[4], 
-								myBusService.formattedDepartureTime(t, hours, minutes), str[2] });
+								myBusService.formattedDepartureTime(t, hours, minutes), 
+								str[2], myDBName });
 					}
 					publishProgress(((int) ((i / (float) mStops.length) * 100)));
 				}
