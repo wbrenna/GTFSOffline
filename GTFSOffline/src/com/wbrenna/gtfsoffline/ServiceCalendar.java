@@ -194,6 +194,29 @@ public class ServiceCalendar {
 		retstr = process_db(service_id, date, limittotoday, csr);
 		csr.close();
 
+		//sometimes calendar_dates contains the trip and not calendar.
+		//We therefore must also process here if retstr is null:
+		if (retstr == null) {
+			// Check for exceptions
+			final String[] selectargs2 = { date, service_id };
+			final Cursor exp = mDB.rawQuery(mDBQueryDate, selectargs2);
+			if (exp.moveToFirst()) {
+				final int exception = exp.getInt(exp.getColumnIndex("exception_type"));
+				exp.close();
+				if (exception == 1) {
+					//retstr = getDays(csr); // service added for this day
+					retstr = "Special Schedule (Holiday)";
+				}
+				//Log.e(TAG, "bogus exception type " + exception + " for service " + service_id + "!");
+				//return null;
+				//do nothing
+			} else {
+				exp.close();
+			}
+		}
+
+		
+		
 		// Save in cache
 		if (limittotoday) {
 			truemap.put(service_id + date, retstr);
@@ -235,7 +258,8 @@ public class ServiceCalendar {
 			timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
 
 			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead,t.minute,t.second);
-			q = "select distinct trip_id,departure_time from stop_times where stop_id = ? and departure_time >= ? and departure_time <= ?";
+			q = "select distinct trip_id,departure_time from stop_times where stop_id = ? " +
+					"and departure_time >= ? and departure_time <= ?";
 			date = String.format("%04d%02d%02d", t.year, t.month+1, t.monthDay);
 		}
 
