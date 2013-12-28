@@ -46,6 +46,8 @@ public class LocationFragmentHelper {
 	private static final String TAG = "LocationFragmentHelper";
 	private static String FAVSTOPS_KEY;
 
+	private static int GRID_SIZE = 1;
+
 	private static int NUM_CLOSEST_STOPS;
 	private static int NUM_BUSES;	//the number of next buses per stop to be shown.
 
@@ -148,12 +150,21 @@ public class LocationFragmentHelper {
 				return null;
 			}
 			
-			final String qry = "select stop_id as _id, stop_lat, stop_lon, stop_name from stops";
-			int maxcount;
+			double myLongitude = mLocation.getLongitude();
+			double myLatitude = mLocation.getLatitude();
+			double myTop = myLatitude + (180/Math.PI)*(GRID_SIZE/6378137);
+			double myBottom = myLatitude - (180/Math.PI)*(GRID_SIZE/6378137);
+			double myLeft = myLongitude - (180/Math.PI)*(GRID_SIZE/6378137)/Math.cos(Math.PI/180.0*myLatitude);
+			double myRight = myLongitude + (180/Math.PI)*(GRID_SIZE/6378137)/Math.cos(Math.PI/180.0*myLatitude);
 
+			final String qry = "select stop_id as _id, stop_lat, stop_lon, stop_name from stops " +
+				"where stop_lat < ? and stop_lat > ? and stop_lon < ? and stop_lon > ?";
+			int maxcount;
+			final String[] selectargs = new String[] { myTop, myBottom, myRight, myLeft };
+			
 			// Load the stops from the database the first time through
 			if (mStops == null) {
-				final Cursor csr = mDatabaseHelper.ReadableDB(myDBName, myDB).rawQuery(qry, null);
+				final Cursor csr = mDatabaseHelper.ReadableDB(myDBName, myDB).rawQuery(qry, selectargs);
 				maxcount = csr.getCount();
 				mStops = new StopLocn[maxcount];
 				boolean more = csr.moveToPosition(0);

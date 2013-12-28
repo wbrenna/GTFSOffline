@@ -228,6 +228,96 @@ public class ServiceCalendar {
 	}
 
 
+	public ArrayList<String[]> getNextDepartureTimesGen(String stops[], int maxResultsPerStop, int hoursLookAhead) {
+		final Time t = new Time();
+		t.setToNow();
+		final String timenow;
+		final String timelimit;
+		String q;
+		String date;
+
+		//process stops to be an array for sqlite, minimizing queries:
+		String stopsString = stops.toString();
+		stopsString = stopsString.replace("[","(");
+		stopsString = stopsString.replace("]",")");
+
+		if (t.hour <= 5) {
+			timenow = String.format("%02d%02d%02d", t.hour+24, t.minute+1, t.second);
+			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead+24,t.minute,t.second);
+			q = "select distinct trip_id,departure_time,stop_id from stop_times where stop_id in " + stopsString
+				+ " and (departure_time >= ? and departure_time <= ?)";
+			Calendar cal = Calendar.getInstance();
+			cal.set(t.year, t.month, t.monthDay);
+			cal.add(Calendar.DAY_OF_MONTH, -1);
+			date = String.format("%04d%02d%02d", cal.get(Calendar.YEAR), 
+					cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH));
+		}
+		else {
+			timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
+
+			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead,t.minute,t.second);
+			q = "select distinct trip_id,departure_time,stop_id from stop_times where stop_id in " + stopsString +
+					"and departure_time >= ? and departure_time <= ?";
+			date = String.format("%04d%02d%02d", t.year, t.month+1, t.monthDay);
+		}
+		final String[] selectargs = new String[] { timenow, timelimit };
+		mDB = mDatabaseHelper.ReadableDB(mDBName, mDB);
+		if( mDB == null )
+		{
+			Log.e(TAG,"Couldn't access database!");
+			return null;
+		}
+		final Cursor csr = mDB.rawQuery(q, selectargs);
+		final ArrayList<String[]> listdetails = new ArrayList<String[]>(0);
+		final ArrayList<String[]> results = new ArrayList<String[]>(0);
+		boolean more = csr.moveToFirst();
+		while (more) {
+			final String trip_id = csr.getString(0);
+			final String daysstr = this.getTripDaysofWeek(trip_id, date, true);
+
+			// departure_time	daystorun	trip_id		stop_id
+			if (daysstr != null) {
+				listdetails.add(new String[] { csr.getString(1), daysstr, trip_id, csr.getString(2) });
+			}
+
+
+			more = csr.moveToNext();
+		}
+		csr.close();
+		
+		if ( listdetails.size() > 0)
+		{
+			Collections.sort(listdetails, new Comparator <String[]>() {
+				public int compare(String[] a, String[] b) {
+					return (a[0].compareTo(b[0]));
+				}
+			});
+			for (int i = 0; i < Math.min(maxResults,listdetails.size()); i++ ) {
+
+				final String q2 = "select route_long_name, route_short_name, trip_headsign from routes " +
+						"join trips on routes.route_id = trips.route_id where trip_id = ?";
+				final String[] selectargs2 = new String[] { listdetails.get(i)[2] };
+				final Cursor csr2 = mDatabaseHelper.ReadableDB(mDBName, mDB).rawQuery(q2, selectargs2);
+				csr2.moveToFirst();
+	// departuretime	runstoday	trip_id		route_short_name	trip_headsign		stop_id	
+	//	140300		1		34867		13			Route 13 Laurelwood	xxxx
+				if (csr2.getString(2).equals(""))
+				{
+					results.add(new String[] { listdetails.get(i)[0], listdetails.get(i)[1], listdetails.get(i)[2], csr2.getString(0), csr2.getString(2), listdetails.get(i)[3] });
+				} else {
+					results.add(new String[] { listdetails.get(i)[0], listdetails.get(i)[1], listdetails.get(i)[2], csr2.getString(1), csr2.getString(2), listdetails.get(i)[3] });
+				}
+				csr2.close();
+				
+			}
+			return results;
+		}
+		else
+		{
+			// No buses in the next "timelimit" (hour)!
+			return null;
+		}
+	}
 
 	/* Return the time and route details of the next bus for any route, or null if there isn't one today. */
 	public ArrayList<String[]> getNextDepartureTimes(String stopid, int maxResults, int hoursLookAhead) {

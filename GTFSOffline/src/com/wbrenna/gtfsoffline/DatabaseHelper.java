@@ -98,29 +98,14 @@ public class DatabaseHelper {
 			if( test == null ) {
 				break;
 			}
-			CloseDB(test);
 			test = null;
-			DB_NAMES.add(DB_NAME);
-		
-			// Delete the old database if it exists, and recreate on the sdcard.
-			/**if (!DB_PATH.equals(DB_OLD_PATH)) {
-				final File olddb = new File(DB_OLD_PATH + DB_NAME);
-				if (olddb.exists() && !olddb.delete()) {
-					Log.e(TAG, "failed to delete old db...!?");
-				}
-
-				// The database is on the sdcard.
-				final String sdstate = Environment.getExternalStorageState();
-				if (!sdstate.equals(Environment.MEDIA_MOUNTED)) {
-					final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-					builder.setTitle("The external database is unavailable.")
-					.setMessage("The sdcard is in state `" + sdstate
-							+ "'.\nPlease retry when it is available.").create().show();
-					return;
-				}
+			if(isDBExpired(DB_NAME),test) {
+				CloseDB(test);
+				//do the toast
+			} else {
+				CloseDB(test);
+				DB_NAMES.add(DB_NAME);
 			}
-			**/
-		
 		
 		}
 
@@ -186,23 +171,10 @@ public class DatabaseHelper {
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	/* We will check the calendar to make sure that the database isn't expired */
+	public boolean isDBExpired(String aDBName, SQLiteDatabase aDB) {
+		
+
+		return false;
+	}
 }
