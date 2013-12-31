@@ -10,6 +10,10 @@
         android:key="@string/pref_ampmtimes_key"
         android:title="@string/ampmtimes" />
     
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_vibrate_key"
+        android:title="@string/vibratenearbus" />
     
     <ListPreference
         android:defaultValue="@string/default_hours_look_ahead"
@@ -32,6 +36,13 @@
         android:entryValues="@array/ClosestStopNumberStrings"
         android:entries="@array/ClosestStopNumberStrings"
         android:title="@string/num_closest_stops" />
+    
+    <ListPreference
+        android:defaultValue="@string/default_grid_size_km"
+        android:key="@string/pref_grid_size_key"
+        android:entryValues="@array/GridSizeKm"
+        android:entries="@array/GridSizeKm"
+        android:title="@string/grid_size" />
     
     
     <MultiSelectListPreference

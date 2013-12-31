@@ -19,7 +19,14 @@
     <string name="pref_hours_look_ahead">hourslookahead</string>
     <string name="num_hours_look_ahead">Number of Hours to Look Ahead</string>
     <string name="default_hours_look_ahead">1</string>
+
+    <string name="pref_grid_size_key">gridsizekm</string>
+    <string name="grid_size">Grid Size (km)</string>
+    <string name="default_grid_size_km">1</string>
 	
+    <string name="pref_vibrate_key">busvibratekey</string>
+    <string name="vibratenearbus">Vibrate when bus is near</string>
+
     <string name="about">About</string>
     <string name="ampmtimes">Show times as am/pm</string>
     <string name="app_description"></string>
