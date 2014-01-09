@@ -83,6 +83,7 @@ EOT
 #sort the file stops.txt and create a column of numbers
 #$sortvar = "stop_sorted,"
 calendartest=false
+calendartest2=false
 
 while [ $# -gt 0 ]
 do
@@ -115,7 +116,20 @@ do
 		echo ".import $tmpfile $table"
 	    ) | $SQ3 $DB.new
 	    ;;
-    calendar.txt|routes.txt|trips.txt)
+    calendar.txt)
+	    calendartest2=true
+	    table=$(echo `basename $1` | sed -e 's/\..*//')
+	    #columns=$(head -1 $file)
+	    columns=$(cat $file | tr -d '\015' | head -n 1)
+	    #cat $file | sed -e1d > $tmpfile
+	    tail -n +2 "$file" > $tmpfile
+	    (
+		echo "create table $table($columns);"
+		echo ".separator ,"
+		echo ".import $tmpfile $table"
+	    ) | $SQ3 $DB.new
+	    ;;
+    routes.txt|trips.txt)
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
 	    #columns=$(head -1 $file)
 	    columns=$(cat $file | tr -d '\015' | head -n 1)
@@ -157,7 +171,18 @@ then
 		echo ".separator ,"
 	) | $SQ3 $DB.new
 fi
-	
+
+#This is not robust if some of these files don't exist. In particular, calendar can be excluded. Handle that here:
+if ! $calendartest2
+then
+	echo "WARNING: Could not find calendar.txt. Creating an empty table for regular data..."
+	table="calendar"
+	columns="service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date"
+	(
+		echo "create table $table($columns);"
+		echo ".separator ,"
+	) | $SQ3 $DB.new
+fi
 
 $SQ3 $DB.new <<-EOT
   create index stops_stop_id on stops ( stop_id );

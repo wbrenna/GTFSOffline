@@ -174,6 +174,7 @@ public class DatabaseHelper {
 	/* We will check the calendar to make sure that the database isn't expired */
 	public boolean isDBExpired(String aDBName, SQLiteDatabase aDB) {
 		
+		// ** ensure we check both calendar and calendar_dates for trips within this date range. sometimes databases only use one of the two.
 
 		return false;
 	}
