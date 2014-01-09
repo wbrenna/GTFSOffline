@@ -99,7 +99,7 @@ public class DatabaseHelper {
 				break;
 			}
 			test = null;
-			if(isDBExpired(DB_NAME),test) {
+			if(isDBExpired(DB_NAME, test)) {
 				CloseDB(test);
 				//do the toast
 			} else {

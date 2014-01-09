@@ -160,7 +160,8 @@ public class LocationFragmentHelper {
 			final String qry = "select stop_id as _id, stop_lat, stop_lon, stop_name from stops " +
 				"where stop_lat < ? and stop_lat > ? and stop_lon < ? and stop_lon > ?";
 			int maxcount;
-			final String[] selectargs = new String[] { myTop, myBottom, myRight, myLeft };
+			final String[] selectargs = new String[] { Double.toString(myTop), Double.toString(myBottom), 
+					Double.toString(myRight), Double.toString(myLeft) };
 			
 			// Load the stops from the database the first time through
 			if (mStops == null) {

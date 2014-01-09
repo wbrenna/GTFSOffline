@@ -21,6 +21,7 @@
 package com.wbrenna.gtfsoffline;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -154,44 +155,49 @@ public class FavFragmentHelper {
 			for (String myDBName : mActiveDB) {
 				//Log.e(TAG, "Running on database: " + myDBName);
 				SQLiteDatabase myDB = mDatabaseHelper.ReadableDB(myDBName, null);
-		//		for (int i = 0; i < mStops.length; i++) {
-					String[] mStopIdArray = mStops[].stop_id;
+				String[] mStopIdArray = new String[mStops.length];
+				for (int i = 0; i < mStops.length; i++) {
+					mStopIdArray[i] = mStops[i].stop_id;
 					//final StopLocn s = mStops[i];
 					//Log.e(TAG, "Running on stop: " + s.stop_id);
-
-					//Now, we need to query to find the next NUM_BUSES.
-					ServiceCalendar myBusService = new ServiceCalendar(myDBName, myDB, ampmflag);
-					myBusService.setDB(mDatabaseHelper);
-					final ArrayList<String[]> fullResults = myBusService.getNextDepartureTimes(
-								mStopIdArray, NUM_BUSES, hoursLookAhead);
-					//the format of this:
-					// departuretime	runstoday	trip_id		route_short_name	trip_headsign
-					//	140300				1		34867		13					Route 13 Laurelwood
-					
-					
-					final Time t = new Time();
-					t.setToNow();
-					if (fullResults == null)
-					{
-						continue;
-					}
-					for (String[] str: fullResults) {
-						//process str[0] to get the right departure time
-						final String hours = str[0].substring(0,2);
-						final String minutes = str[0].substring(2,4);
-						//String departsIn;
-			
-						//Log.e(TAG, "Adding to list: " + s.stop_name);
-						mListDetails.add(new String[] { "", 
-								str[5], 
-								mStops[mStopIdArray.indexOf(str[5])].stop_name, str[4], 
-								myBusService.formattedDepartureTime(t, hours, minutes), 
-								str[2], myDBName });
-					}
-					//publishProgress(((int) ((i / (float) mStops.length) * 100)));
-					//progress monitor won't work anymore
-					//TODO: fix progress monitor
 				}
+				
+				//Now, we need to query to find the next NUM_BUSES.
+				ServiceCalendar myBusService = new ServiceCalendar(myDBName, myDB, ampmflag);
+				myBusService.setDB(mDatabaseHelper);
+				final ArrayList<String[]> fullResults = myBusService.getNextDepartureTimesGen(
+							//mStopIdArray, NUM_BUSES, hoursLookAhead);
+							mStopIdArray, NUM_BUSES, hoursLookAhead);
+				//the format of this:
+				// departuretime	runstoday	trip_id		route_short_name	trip_headsign
+				//	140300				1		34867		13					Route 13 Laurelwood
+				
+				
+				final Time t = new Time();
+				t.setToNow();
+				if (fullResults == null)
+				{
+					continue;
+				}
+				for (String[] str: fullResults) {
+					//process str[0] to get the right departure time
+					final String hours = str[0].substring(0,2);
+					final String minutes = str[0].substring(2,4);
+					//String departsIn;
+		
+					//Log.e(TAG, "Adding to list: " + s.stop_name);
+					mListDetails.add(new String[] { "", 
+							str[5], 
+							mStops[Arrays.asList(mStopIdArray).indexOf(str[5])].stop_name, str[4], 
+							myBusService.formattedDepartureTime(t, hours, minutes), 
+							str[2], myDBName });
+				}
+				//TODO: this can be cleaned up a little! Maybe a better array type
+				
+				//publishProgress(((int) ((i / (float) mStops.length) * 100)));
+				//progress monitor won't work anymore
+				//TODO: fix progress monitor
+				
 				//close the database
 				mDatabaseHelper.CloseDB(myDB);
 			}

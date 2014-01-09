@@ -228,7 +228,7 @@ public class ServiceCalendar {
 	}
 
 
-	public ArrayList<String[]> getNextDepartureTimesGen(String stops[], int maxResultsPerStop, int hoursLookAhead) {
+	public ArrayList<String[]> getNextDepartureTimesGen(String[] stops, int maxResultsPerStop, int hoursLookAhead) {
 		final Time t = new Time();
 		t.setToNow();
 		final String timenow;
@@ -292,7 +292,7 @@ public class ServiceCalendar {
 					return (a[0].compareTo(b[0]));
 				}
 			});
-			for (int i = 0; i < Math.min(maxResults,listdetails.size()); i++ ) {
+			for (int i = 0; i < Math.min(maxResultsPerStop,listdetails.size()); i++ ) {
 
 				final String q2 = "select route_long_name, route_short_name, trip_headsign from routes " +
 						"join trips on routes.route_id = trips.route_id where trip_id = ?";
