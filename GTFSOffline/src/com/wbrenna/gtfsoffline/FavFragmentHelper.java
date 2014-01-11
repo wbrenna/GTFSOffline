@@ -179,6 +179,9 @@ public class FavFragmentHelper {
 				{
 					continue;
 				}
+				final int favcounter = fullResults.size();
+				int loopcounter = 0;
+				
 				for (String[] str: fullResults) {
 					//process str[0] to get the right departure time
 					final String hours = str[0].substring(0,2);
@@ -191,12 +194,9 @@ public class FavFragmentHelper {
 							mStops[Arrays.asList(mStopIdArray).indexOf(str[5])].stop_name, str[4], 
 							myBusService.formattedDepartureTime(t, hours, minutes), 
 							str[2], myDBName });
+					publishProgress(((int) ((++loopcounter / (float) favcounter) * 100)));
 				}
 				//TODO: this can be cleaned up a little! Maybe a better array type
-				
-				//publishProgress(((int) ((i / (float) mStops.length) * 100)));
-				//progress monitor won't work anymore
-				//TODO: fix progress monitor
 				
 				//close the database
 				mDatabaseHelper.CloseDB(myDB);

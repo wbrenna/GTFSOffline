@@ -46,8 +46,7 @@ public class LocationFragmentHelper {
 	private static final String TAG = "LocationFragmentHelper";
 	private static String FAVSTOPS_KEY;
 
-	private static int GRID_SIZE = 1;
-
+	private static int grid_size;
 	private static int NUM_CLOSEST_STOPS;
 	private static int NUM_BUSES;	//the number of next buses per stop to be shown.
 
@@ -111,6 +110,8 @@ public class LocationFragmentHelper {
 								mContext.getString(R.string.pref_num_buses_per_stop), "3"));
 		hoursLookAhead = Integer.parseInt(mPrefs.getString(
 					mContext.getString(R.string.pref_hours_look_ahead), "1"));
+		grid_size = Integer.parseInt(mPrefs.getString(
+				mContext.getString(R.string.pref_grid_size_key), "1"));
 	}
 
 	public ArrayList<String[]> retrieveNextBusList() {
@@ -152,10 +153,10 @@ public class LocationFragmentHelper {
 			
 			double myLongitude = mLocation.getLongitude();
 			double myLatitude = mLocation.getLatitude();
-			double myTop = myLatitude + (180/Math.PI)*(GRID_SIZE/6378137);
-			double myBottom = myLatitude - (180/Math.PI)*(GRID_SIZE/6378137);
-			double myLeft = myLongitude - (180/Math.PI)*(GRID_SIZE/6378137)/Math.cos(Math.PI/180.0*myLatitude);
-			double myRight = myLongitude + (180/Math.PI)*(GRID_SIZE/6378137)/Math.cos(Math.PI/180.0*myLatitude);
+			double myTop = myLatitude + (180/Math.PI)*(grid_size/6378137);
+			double myBottom = myLatitude - (180/Math.PI)*(grid_size/6378137);
+			double myLeft = myLongitude - (180/Math.PI)*(grid_size/6378137)/Math.cos(Math.PI/180.0*myLatitude);
+			double myRight = myLongitude + (180/Math.PI)*(grid_size/6378137)/Math.cos(Math.PI/180.0*myLatitude);
 
 			final String qry = "select stop_id as _id, stop_lat, stop_lon, stop_name from stops " +
 				"where stop_lat < ? and stop_lat > ? and stop_lon < ? and stop_lon > ?";
