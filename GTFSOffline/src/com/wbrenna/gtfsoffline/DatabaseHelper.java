@@ -30,6 +30,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.text.format.Time;
 import android.util.Log;
+import android.widget.Toast;
 
 public class DatabaseHelper {
 	private static final String TAG = "DatabaseHelper"; // getClass().getSimpleName();
@@ -100,13 +101,16 @@ public class DatabaseHelper {
 			if( test == null ) {
 				break;
 			}
-			test = null;
 			if(isDBExpired(DB_NAME, test)) {
 				CloseDB(test);
+				test = null;
 				//do the toast
+				Toast.makeText(mContext, "Database " + DB_NAME + " is expired.", 
+						Toast.LENGTH_LONG).show();
 				
 			} else {
 				CloseDB(test);
+				test = null;
 				DB_NAMES.add(DB_NAME);
 			}
 		

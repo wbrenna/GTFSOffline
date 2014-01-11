@@ -189,9 +189,11 @@ public class FavFragmentHelper {
 					//String departsIn;
 		
 					//Log.e(TAG, "Adding to list: " + s.stop_name);
+					int myIndex = Arrays.asList(mStopIdArray).indexOf(str[5]);
+					
 					mListDetails.add(new String[] { "", 
 							str[5], 
-							mStops[Arrays.asList(mStopIdArray).indexOf(str[5])].stop_name, str[4], 
+							mStops[myIndex].stop_name, str[4], 
 							myBusService.formattedDepartureTime(t, hours, minutes), 
 							str[2], myDBName });
 					publishProgress(((int) ((++loopcounter / (float) favcounter) * 100)));

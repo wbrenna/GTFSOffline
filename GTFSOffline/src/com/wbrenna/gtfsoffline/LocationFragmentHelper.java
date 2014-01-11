@@ -153,16 +153,25 @@ public class LocationFragmentHelper {
 			
 			double myLongitude = mLocation.getLongitude();
 			double myLatitude = mLocation.getLatitude();
-			double myTop = myLatitude + (180/Math.PI)*(grid_size/6378137);
-			double myBottom = myLatitude - (180/Math.PI)*(grid_size/6378137);
-			double myLeft = myLongitude - (180/Math.PI)*(grid_size/6378137)/Math.cos(Math.PI/180.0*myLatitude);
-			double myRight = myLongitude + (180/Math.PI)*(grid_size/6378137)/Math.cos(Math.PI/180.0*myLatitude);
+			double myTop = myLatitude + (180.0/Math.PI)*(grid_size/6378.1370);
+			double myBottom = myLatitude - (180.0/Math.PI)*(grid_size/6378.1370);
+			double myLeft = myLongitude - (180.0/Math.PI)*(grid_size/6378.1370)/Math.cos(Math.PI/180.0*myLatitude);
+			double myRight = myLongitude + (180.0/Math.PI)*(grid_size/6378.1370)/Math.cos(Math.PI/180.0*myLatitude);
 
-			final String qry = "select stop_id as _id, stop_lat, stop_lon, stop_name from stops " +
-				"where stop_lat < ? and stop_lat > ? and stop_lon < ? and stop_lon > ?";
+			final String qry;
+			final String[] selectargs;
+			if ( grid_size == 0 ) {
+				//we want to look as far as possible away.
+				qry = "select stop_id as _id, stop_lat, stop_lon, stop_name from stops";
+				selectargs = new String[] { };
+			} else {
+				qry = "select stop_id as _id, stop_lat, stop_lon, stop_name from stops " +
+						"where stop_lat < ? and stop_lat > ? and stop_lon < ? and stop_lon > ?";
+				selectargs = new String[] { Double.toString(myTop), Double.toString(myBottom), 
+					Double.toString(myLeft), Double.toString(myRight) };
+			}
 			int maxcount;
-			final String[] selectargs = new String[] { Double.toString(myTop), Double.toString(myBottom), 
-					Double.toString(myRight), Double.toString(myLeft) };
+
 			
 			// Load the stops from the database the first time through
 			if (mStops == null) {

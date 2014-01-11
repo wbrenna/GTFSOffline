@@ -22,6 +22,7 @@
 package com.wbrenna.gtfsoffline;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -237,15 +238,26 @@ public class ServiceCalendar {
 		String date;
 
 		//process stops to be an array for sqlite, minimizing queries:
-		String stopsString = stops.toString();
-		stopsString = stopsString.replace("[","(");
-		stopsString = stopsString.replace("]",")");
+		//String stopsString = Arrays.toString(stops);
+		//does not preserve quotation marks
+		String stopsString = "( ";
+		for (int i = 0; i < stops.length-1; i++)
+		{
+		    stops[i] = "\"" + stops[i] + "\"";
+		    stopsString += stops[i] + ", ";
+		}
+		stopsString += "\"" + stops[stops.length-1] + "\" )";
+		//stopsString = stopsString.replace("[","(");
+		//stopsString = stopsString.replace("]",")");
 
+		Log.w(TAG,"Stopstring is " + stopsString);
+		
 		if (t.hour <= 5) {
 			timenow = String.format("%02d%02d%02d", t.hour+24, t.minute+1, t.second);
 			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead+24,t.minute,t.second);
-			q = "select distinct trip_id,departure_time,stop_id from stop_times where stop_id in " + stopsString
-				+ " and (departure_time >= ? and departure_time <= ?)";
+			q = "select distinct trip_id,departure_time,stop_id from stop_times where stop_id in " 
+					+ stopsString
+					+ " and (departure_time >= ? and departure_time <= ?)";
 			Calendar cal = Calendar.getInstance();
 			cal.set(t.year, t.month, t.monthDay);
 			cal.add(Calendar.DAY_OF_MONTH, -1);
@@ -256,7 +268,8 @@ public class ServiceCalendar {
 			timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
 
 			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead,t.minute,t.second);
-			q = "select distinct trip_id,departure_time,stop_id from stop_times where stop_id in " + stopsString +
+			q = "select distinct trip_id,departure_time,stop_id from stop_times where stop_id in " 
+					+ stopsString +
 					"and departure_time >= ? and departure_time <= ?";
 			date = String.format("%04d%02d%02d", t.year, t.month+1, t.monthDay);
 		}
