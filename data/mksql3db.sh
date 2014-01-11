@@ -119,9 +119,7 @@ do
     calendar.txt)
 	    calendartest2=true
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
-	    #columns=$(head -1 $file)
 	    columns=$(cat $file | tr -d '\015' | head -n 1)
-	    #cat $file | sed -e1d > $tmpfile
 	    tail -n +2 "$file" > $tmpfile
 	    (
 		echo "create table $table($columns);"
@@ -131,9 +129,7 @@ do
 	    ;;
     routes.txt|trips.txt)
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
-	    #columns=$(head -1 $file)
-	    columns=$(cat $file | tr -d '\015' | head -n 1)
-	    #cat $file | sed -e1d > $tmpfile
+	    columns=$(cat $file | tr -d '\015' | sed -e '1 s/^\xef\xbb\xbf//' | head -n 1)
 	    tail -n +2 "$file" > $tmpfile
 	    (
 		echo "create table $table($columns);"
