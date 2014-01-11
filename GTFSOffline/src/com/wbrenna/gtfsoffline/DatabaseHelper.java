@@ -187,8 +187,8 @@ public class DatabaseHelper {
 		final String date = String.format("%04d%02d%02d", t.year, 
 				t.month+1, t.monthDay);
 		
-		final String mDBQuery = "select * from calendar where end_date <= ?";
-		final String mDBQueryDate = "select * from calendar_dates where date <= ?";
+		final String mDBQuery = "select * from calendar where end_date >= ?";
+		final String mDBQueryDate = "select * from calendar_dates where date >= ?";
 		final String[] selectargs = { date };
 		final Cursor exp1 = aDB.rawQuery(mDBQuery, selectargs);
 		if (!exp1.moveToFirst()) {
