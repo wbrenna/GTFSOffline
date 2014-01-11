@@ -25,8 +25,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.text.format.Time;
 import android.util.Log;
 
 public class DatabaseHelper {
@@ -102,6 +104,7 @@ public class DatabaseHelper {
 			if(isDBExpired(DB_NAME, test)) {
 				CloseDB(test);
 				//do the toast
+				
 			} else {
 				CloseDB(test);
 				DB_NAMES.add(DB_NAME);
@@ -174,8 +177,28 @@ public class DatabaseHelper {
 	/* We will check the calendar to make sure that the database isn't expired */
 	public boolean isDBExpired(String aDBName, SQLiteDatabase aDB) {
 		
-		// ** ensure we check both calendar and calendar_dates for trips within this date range. sometimes databases only use one of the two.
-
+		// ** ensure we check both calendar and calendar_dates for trips within this date range. sometimes databases only use one of the two. 
+		final Time t = new Time();
+		t.setToNow();
+		final String date = String.format("%04d%02d%02d", t.year, 
+				t.month+1, t.monthDay);
+		
+		final String mDBQuery = "select * from calendar where end_date <= ?";
+		final String mDBQueryDate = "select * from calendar_dates where date <= ?";
+		final String[] selectargs = { date };
+		final Cursor exp1 = aDB.rawQuery(mDBQuery, selectargs);
+		if (!exp1.moveToFirst()) {
+			exp1.close();
+			final Cursor exp2 = aDB.rawQuery(mDBQueryDate, selectargs);
+			if (exp2.moveToFirst()) {
+				exp2.close();
+				return false;
+			}
+			exp2.close();
+			return true;
+		}
+		exp1.close();
+		
 		return false;
 	}
 }
