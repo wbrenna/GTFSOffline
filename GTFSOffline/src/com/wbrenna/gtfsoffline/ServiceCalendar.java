@@ -243,14 +243,14 @@ public class ServiceCalendar {
 		String stopsString = "( ";
 		for (int i = 0; i < stops.length-1; i++)
 		{
-		    stops[i] = "\"" + stops[i] + "\"";
-		    stopsString += stops[i] + ", ";
+		    String tmpstops = "\"" + stops[i] + "\"";
+		    stopsString += tmpstops + ", ";
 		}
 		stopsString += "\"" + stops[stops.length-1] + "\" )";
 		//stopsString = stopsString.replace("[","(");
 		//stopsString = stopsString.replace("]",")");
 
-		Log.w(TAG,"Stopstring is " + stopsString);
+		//Log.w(TAG,"Stopstring is " + stopsString);
 		
 		if (t.hour <= 5) {
 			timenow = String.format("%02d%02d%02d", t.hour+24, t.minute+1, t.second);
@@ -284,15 +284,39 @@ public class ServiceCalendar {
 		final ArrayList<String[]> listdetails = new ArrayList<String[]>(0);
 		final ArrayList<String[]> results = new ArrayList<String[]>(0);
 		boolean more = csr.moveToFirst();
-		while (more) {
+		
+		boolean stopsRemaining = true;
+		int nStopsInDB = 0;
+		int[] stopCounter = new int[stops.length]; //this is guaranteed to be zero by l.spec.
+		ArrayList<String> stopsList = new ArrayList<String>(Arrays.asList(stops));
+		
+		while (more && stopsRemaining) {
 			final String trip_id = csr.getString(0);
+			final String stop_id = csr.getString(2);
+			final int indexOfStop = stopsList.indexOf(stop_id);
+			if(indexOfStop == -1) {
+				more = csr.moveToNext();
+				continue;
+			}
 			final String daysstr = this.getTripDaysofWeek(trip_id, date, true);
 
 			// departure_time	daystorun	trip_id		stop_id
 			if (daysstr != null) {
-				listdetails.add(new String[] { csr.getString(1), daysstr, trip_id, csr.getString(2) });
+				listdetails.add(new String[] { csr.getString(1), daysstr, trip_id, stop_id });
+				
+				//now we keep track of the fav stops we've satisfied.
+				if (stopCounter[indexOfStop] == 0) {
+					nStopsInDB++;
+				}
+				if( (++stopCounter[indexOfStop]) >=  maxResultsPerStop ) {
+					stopsList.remove(indexOfStop);
+					stopCounter[indexOfStop] = 0;
+				}
+				if(stopsList.isEmpty()) {
+					stopsRemaining = false;
+				}
 			}
-
+			//TODO: can probably make this better as well
 
 			more = csr.moveToNext();
 		}
@@ -305,7 +329,7 @@ public class ServiceCalendar {
 					return (a[0].compareTo(b[0]));
 				}
 			});
-			for (int i = 0; i < Math.min(maxResultsPerStop,listdetails.size()); i++ ) {
+			for (int i = 0; i < Math.min(maxResultsPerStop*nStopsInDB,listdetails.size()); i++ ) {
 
 				final String q2 = "select route_long_name, route_short_name, trip_headsign from routes " +
 						"join trips on routes.route_id = trips.route_id where trip_id = ?";
