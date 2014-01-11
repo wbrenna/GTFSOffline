@@ -10,10 +10,6 @@
         android:key="@string/pref_ampmtimes_key"
         android:title="@string/ampmtimes" />
     
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="@string/pref_vibrate_key"
-        android:title="@string/vibratenearbus" />
     
     <ListPreference
         android:defaultValue="@string/default_hours_look_ahead"
