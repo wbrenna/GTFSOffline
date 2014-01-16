@@ -28,6 +28,7 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -121,6 +122,10 @@ public class MainActivity extends FragmentActivity implements
 			{
 				workingDBList.add(tmpDBActive[i]);
 			}
+			else
+			{
+				initial_preferences.remove(tmpDBActive[i]);
+			}
 		}
 		if (workingDBList.size() == 0)
 		{
@@ -129,6 +134,9 @@ public class MainActivity extends FragmentActivity implements
 			mDBActive = workingDBList.toArray(new String[workingDBList.size()]);
 		}
 		
+		Editor prefsDBEditor = mPrefs.edit();
+		prefsDBEditor.putStringSet(getString(R.string.pref_dbs), initial_preferences);
+		prefsDBEditor.commit();
 		
 		//Set up the location management
 		mLocationHelper = new LocationHelper(this);
@@ -168,7 +176,7 @@ public class MainActivity extends FragmentActivity implements
 		//eventually add automated downloading of databases...
 		
 		
-		// Create the adapter that will return a fragment for each of the three
+		// Create the adapter that will return a fragment for each of the
 		// primary sections of the app.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(
 				getSupportFragmentManager());
@@ -238,14 +246,55 @@ public class MainActivity extends FragmentActivity implements
 			
 			mSectionsPagerAdapter.notifyDataSetChanged();
 			
+			//totally kill the viewPager and all, and recreate!
+			//mSectionsPagerAdapter = null;
+			//getFragmentManager().beginTransaction().replace(containerViewId, fragment);
 			//and create the appropriate tabs
 			final ActionBar actionBar = getActionBar();
 	
+			/**mSectionsPagerAdapter = new SectionsPagerAdapter(
+					getSupportFragmentManager());
+
+			// Set up the ViewPager with the sections adapter.
+			mViewPager = (ViewPager) findViewById(R.id.pager);
+			mViewPager.setAdapter(mSectionsPagerAdapter);
+
+			mViewPager
+					.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+						@Override
+						public void onPageSelected(int position) {
+							actionBar.setSelectedNavigationItem(position);
+						}
+					});**/
+			
 			actionBar.removeAllTabs();
 			for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
 				actionBar.addTab(actionBar.newTab()
 						.setText(mSectionsPagerAdapter.getPageTitle(i))
 						.setTabListener(this));
+				
+				//update the fragment contents
+				/**if (i > 0 ) {
+					Fragment newFragment = new DBListFragment();
+					Bundle args = new Bundle();
+					args.putString(DBListFragment.DATABASE, mDBActive[i-1]);
+					newFragment.setArguments(args);
+					
+					getFragmentManager().beginTransaction().replace(i, newFragment);
+				}**/
+				if (i>0) {
+					DBListFragment aFragment = (DBListFragment) getSupportFragmentManager().
+							findFragmentByTag("android:switcher:"+R.id.pager+":"+Integer.toString(i));
+					if (aFragment != null) {
+						getSupportFragmentManager().beginTransaction().remove(aFragment).commit();
+						mSectionsPagerAdapter.notifyDataSetChanged();
+						if (aFragment.getView() != null) {
+							//aFragment.updateDisplay();
+
+						}
+						
+					}
+				}
 	
 			}
 		}
@@ -317,9 +366,11 @@ public class MainActivity extends FragmentActivity implements
 	 * one of the sections/tabs/pages.
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
+		private final FragmentManager mFragmentManager;
 
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
+			mFragmentManager = fm;
 		}
 
 		@Override

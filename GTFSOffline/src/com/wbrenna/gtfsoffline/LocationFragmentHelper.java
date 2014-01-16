@@ -260,9 +260,14 @@ public class LocationFragmentHelper {
 						stop_limit++;
 					}
 					continue;
+				} else if (fullResultsA == null) {
+					//do nothing
+				} else if (fullResults == null) {
+					fullResults = fullResultsA;
 				}
-
-				fullResults.addAll(fullResultsA);
+				else {
+					fullResults.addAll(fullResultsA);
+				}
 				
 				for (String[] str: fullResults) {
 					//process the result string to get the right departure time

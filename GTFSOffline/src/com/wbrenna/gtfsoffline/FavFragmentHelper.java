@@ -181,10 +181,14 @@ public class FavFragmentHelper {
 				if ((fullResults == null) && (fullResultsA == null))
 				{
 					continue;
+				} else if (fullResultsA == null) {
+					//do nothing
+				} else if (fullResults == null) {
+					fullResults = fullResultsA;
+				} else {
+					fullResults.addAll(fullResultsA);
+
 				}
-				
-				fullResults.addAll(fullResultsA);
-				
 				
 				final int favcounter = fullResults.size();
 				int loopcounter = 0;
