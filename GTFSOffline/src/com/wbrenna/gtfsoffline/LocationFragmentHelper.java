@@ -226,6 +226,10 @@ public class LocationFragmentHelper {
 			} else {
 				stop_limit = NUM_CLOSEST_STOPS;
 			}
+			
+			final Time t = new Time();
+			t.setToNow();
+			
 			for (int i = 0; i < stop_limit; i++) {
 				final StopLocn s = mStops[i];
 
@@ -240,21 +244,26 @@ public class LocationFragmentHelper {
 				//the next NUM_BUSES.
 				ServiceCalendar myBusService = new ServiceCalendar(myDBName, myDB, ampmflag);
 				myBusService.setDB(mDatabaseHelper);
-				final ArrayList<String[]> fullResults = myBusService.getNextDepartureTimes(s.stop_id, NUM_BUSES, hoursLookAhead);
+				final ArrayList<String[]> fullResultsA = myBusService.getNextDepartureTimes(t, s.stop_id, 
+						NUM_BUSES, hoursLookAhead, true);
 				//the format of this:
 				// departuretime	runstoday	trip_id		route_short_name	trip_headsign
 				//	140300				1		34867		13					Route 13 Laurelwood
 				
+				ArrayList<String[]> fullResults = myBusService.getNextDepartureTimes(t, s.stop_id, 
+						NUM_BUSES, hoursLookAhead, false);
+				
 
-				if (fullResults == null)
+				if ((fullResults == null) && (fullResultsA == null))
 				{
 					if (stop_limit < mStops.length - 1) {
 						stop_limit++;
 					}
 					continue;
 				}
-				final Time t = new Time();
-				t.setToNow();
+
+				fullResults.addAll(fullResultsA);
+				
 				for (String[] str: fullResults) {
 					//process the result string to get the right departure time
 					final String hours = str[0].substring(0,2);

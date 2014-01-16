@@ -152,40 +152,40 @@ public class FavFragmentHelper {
 				mStops[i].stop_name = tmpStops.get(i)[1];
 			}
 			
+			Time t = new Time();
+			t.setToNow();
+			
 			for (String myDBName : mActiveDB) {
 				//Log.e(TAG, "Running on database: " + myDBName);
 				SQLiteDatabase myDB = mDatabaseHelper.ReadableDB(myDBName, null);
 				String[] mStopIdArray = new String[mStops.length];
 				
-				//ArrayList<String> mStopIdList = new ArrayList<String>();
-				
 				for (int i = 0; i < mStops.length; i++) {
 					mStopIdArray[i] = mStops[i].stop_id;
-					//mStopIdList.add(mStops[i].stop_id);
-					
-					//final StopLocn s = mStops[i];
 					//Log.e(TAG, "Running on stop: " + s.stop_id);
 				}
-				
-				//mStopIdArray = mStopIdList.toArray(mStopIdArray);
 				
 				//Now, we need to query to find the next NUM_BUSES.
 				ServiceCalendar myBusService = new ServiceCalendar(myDBName, myDB, ampmflag);
 				myBusService.setDB(mDatabaseHelper);
-				final ArrayList<String[]> fullResults = myBusService.getNextDepartureTimesGen(
-							//mStopIdArray, NUM_BUSES, hoursLookAhead);
-							mStopIdArray, NUM_BUSES, hoursLookAhead);
+				final ArrayList<String[]> fullResultsA = myBusService.getNextDepartureTimesGen(
+							t, mStopIdArray, NUM_BUSES, hoursLookAhead, true);
 				//the format of this:
 				// departuretime	runstoday	trip_id		route_short_name	trip_headsign
 				//	140300				1		34867		13					Route 13 Laurelwood
 				
-				
-				final Time t = new Time();
-				t.setToNow();
-				if (fullResults == null)
+				ArrayList<String[]> fullResults = myBusService.getNextDepartureTimesGen(
+						t, mStopIdArray, NUM_BUSES, hoursLookAhead, false);
+
+
+				if ((fullResults == null) && (fullResultsA == null))
 				{
 					continue;
 				}
+				
+				fullResults.addAll(fullResultsA);
+				
+				
 				final int favcounter = fullResults.size();
 				int loopcounter = 0;
 				

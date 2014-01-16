@@ -45,6 +45,10 @@ public class ServiceCalendar {
 	private final HashMap<String, String> falsemap;
 	private final HashMap<String, String> trip2servicemap;
 
+	
+	//Since we are less than or equal to 8 hours search length:
+	private final int HOURTOGGLE = 8;
+	
 	// Match day number to a string and an abbreviation
 	private static final String[] mWeekDays = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
 	private static final String[] mWeekDaysAbbrev = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
@@ -229,9 +233,9 @@ public class ServiceCalendar {
 	}
 
 
-	public ArrayList<String[]> getNextDepartureTimesGen(String[] stops, int maxResultsPerStop, int hoursLookAhead) {
-		final Time t = new Time();
-		t.setToNow();
+	public ArrayList<String[]> getNextDepartureTimesGen(Time t, String[] stops, 
+			int maxResultsPerStop, int hoursLookAhead, boolean earlyMorning) {
+
 		final String timenow;
 		final String timelimit;
 		String q;
@@ -252,7 +256,8 @@ public class ServiceCalendar {
 
 		//Log.w(TAG,"Stopstring is " + stopsString);
 		
-		if (t.hour <= 5) {
+		//look for routes from last night
+		if ( (t.hour <= HOURTOGGLE) && (!earlyMorning) ) {
 			timenow = String.format("%02d%02d%02d", t.hour+24, t.minute+1, t.second);
 			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead+24,t.minute,t.second);
 			q = "select distinct trip_id,departure_time,stop_id from stop_times where stop_id in " 
@@ -263,8 +268,21 @@ public class ServiceCalendar {
 			cal.add(Calendar.DAY_OF_MONTH, -1);
 			date = String.format("%04d%02d%02d", cal.get(Calendar.YEAR), 
 					cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH));
+		} else if ( !earlyMorning ) {
+			//look for tomorrow's routes
+			timenow = String.format("%02d%02d%02d", 00, 00, 00);
+			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead-24,t.minute,t.second);
+			q = "select distinct trip_id,departure_time,stop_id from stop_times where stop_id in " 
+					+ stopsString
+					+ " and (departure_time >= ? and departure_time <= ?)";
+			Calendar cal = Calendar.getInstance();
+			cal.set(t.year, t.month, t.monthDay);
+			cal.add(Calendar.DAY_OF_MONTH, 1);
+			date = String.format("%04d%02d%02d", cal.get(Calendar.YEAR), 
+					cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH));
 		}
 		else {
+			//here we have earlyMorning toggled - search for today's routes.
 			timenow = String.format("%02d%02d%02d", t.hour, t.minute+1, t.second);
 
 			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead,t.minute,t.second);
@@ -357,26 +375,34 @@ public class ServiceCalendar {
 	}
 
 	/* Return the time and route details of the next bus for any route, or null if there isn't one today. */
-	public ArrayList<String[]> getNextDepartureTimes(String stopid, int maxResults, int hoursLookAhead) {
-		final Time t = new Time();
-		t.setToNow();
+	public ArrayList<String[]> getNextDepartureTimes(Time t, String stopid, int maxResults, 
+			int hoursLookAhead, boolean earlyMorning) {
+
 		final String timenow;
 		final String timelimit;
 		String q;
 		String date;
 
-
-		if (t.hour <= 5) {
-			//add one minute to prevent negative-one minute errors
+		//look for routes from last night
+		if ( (t.hour <= HOURTOGGLE) && (!earlyMorning) ) {
 			timenow = String.format("%02d%02d%02d", t.hour+24, t.minute+1, t.second);
-
-			//search for the routes along the same service
 			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead+24,t.minute,t.second);
-			q = "select distinct trip_id,departure_time from stop_times where stop_id = ? and (departure_time >= ? and departure_time <= ?)";
+			q = "select distinct trip_id,departure_time,stop_id from stop_times where stop_id = ?" 
+					+ " and (departure_time >= ? and departure_time <= ?)";
 			Calendar cal = Calendar.getInstance();
 			cal.set(t.year, t.month, t.monthDay);
 			cal.add(Calendar.DAY_OF_MONTH, -1);
-			//Date yesterday = cal.getTime();
+			date = String.format("%04d%02d%02d", cal.get(Calendar.YEAR), 
+					cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH));
+		} else if ( !earlyMorning ) {
+			//look for tomorrow's routes
+			timenow = String.format("%02d%02d%02d", 00, 00, 00);
+			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead-24,t.minute,t.second);
+			q = "select distinct trip_id,departure_time,stop_id from stop_times where stop_id = ?" 
+					+ " and (departure_time >= ? and departure_time <= ?)";
+			Calendar cal = Calendar.getInstance();
+			cal.set(t.year, t.month, t.monthDay);
+			cal.add(Calendar.DAY_OF_MONTH, 1);
 			date = String.format("%04d%02d%02d", cal.get(Calendar.YEAR), 
 					cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH));
 		}
@@ -394,13 +420,6 @@ public class ServiceCalendar {
 		//this could be handled earlier in holiday days etc.
 		
 		
-//		final ArrayList<String[]> listdetails = getRouteDepartureTimes(stopid, date, true, null);
-//we will need to significantly optimize this - first of all, we don't want to get ALL route departure times!
-//this can be further optimized by only collecting the next few buses for a given route!
-
-		
-		//final String q = "select distinct departure_time as _id, trip_id from stop_times where stop_id = ? and trip_id in "
-		//		+ "(select trip_id from trips where route_id = ? and trip_headsign = ?) order by departure_time";
 		final String[] selectargs = new String[] { stopid, timenow, timelimit };
 		mDB = mDatabaseHelper.ReadableDB(mDBName, mDB);
 		if( mDB == null )
@@ -411,7 +430,6 @@ public class ServiceCalendar {
 		final Cursor csr = mDB.rawQuery(q, selectargs);
 
 		// Load the array for the list
-		//final int maxcount = csr.getCount();
 		final ArrayList<String[]> listdetails = new ArrayList<String[]>(0);
 		final ArrayList<String[]> results = new ArrayList<String[]>(0);
 
@@ -423,7 +441,6 @@ public class ServiceCalendar {
 			final String trip_id = csr.getString(0);
 
 			final String daysstr = this.getTripDaysofWeek(trip_id, date, true);
-
 			// Only add if the bus runs on this day.
 			// the format here:
 			// departure_time	daystorun	trip_id
@@ -479,28 +496,34 @@ public class ServiceCalendar {
 	}
 
 	/* Return the time of the next bus for a given route, or null if there isn't one today. */
-	public String getNextDepartureTime(String stopid, String routeid, String headsign, 
-				int maxResults, int hoursLookAhead) {
+	public String getNextDepartureTime(Time t, String stopid, String routeid, String headsign, 
+				int maxResults, int hoursLookAhead, boolean earlyMorning) {
 
-		//final ArrayList<String[]> listdetails = getRouteDepartureTimes(stopid, routeid, headsign, date, true, null);
-		final Time t = new Time();
-		t.setToNow();
 		final String timenow;
 		final String timelimit;
 		String q;
 		String date;
 
-		
-		if (t.hour <= 5) {
+		//look for routes from last night
+		if ( (t.hour <= HOURTOGGLE) && (!earlyMorning) ) {
 			timenow = String.format("%02d%02d%02d", t.hour+24, t.minute+1, t.second);
-			//search for the routes along the same service
 			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead+24,t.minute,t.second);
 			q = "select trip_id,departure_time from stop_times where stop_id = ? and departure_time >= ? and departure_time <= ?"
 					+ "join trips on trip_id = ? where trip_headsign = ?";
 			Calendar cal = Calendar.getInstance();
 			cal.set(t.year, t.month, t.monthDay);
 			cal.add(Calendar.DAY_OF_MONTH, -1);
-			//Date yesterday = cal.getTime();
+			date = String.format("%04d%02d%02d", cal.get(Calendar.YEAR), 
+					cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH));
+		} else if ( !earlyMorning ) {
+			//look for tomorrow's routes
+			timenow = String.format("%02d%02d%02d", 00, 00, 00);
+			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead-24,t.minute,t.second);
+			q = "select trip_id,departure_time from stop_times where stop_id = ? and departure_time >= ? and departure_time <= ?"
+					+ "join trips on trip_id = ? where trip_headsign = ?";
+			Calendar cal = Calendar.getInstance();
+			cal.set(t.year, t.month, t.monthDay);
+			cal.add(Calendar.DAY_OF_MONTH, 1);
 			date = String.format("%04d%02d%02d", cal.get(Calendar.YEAR), 
 					cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH));
 		}
