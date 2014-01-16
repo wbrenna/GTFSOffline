@@ -252,7 +252,6 @@ public class LocationFragmentHelper {
 				
 				ArrayList<String[]> fullResults = myBusService.getNextDepartureTimes(t, s.stop_id, 
 						NUM_BUSES, hoursLookAhead, false);
-				
 
 				if ((fullResults == null) && (fullResultsA == null))
 				{
@@ -287,8 +286,13 @@ public class LocationFragmentHelper {
 		}
 
 		@Override
+		protected void onCancelled() {
+			mDatabaseHelper.CloseDB(mDatabaseHelper.ReadableDB(myDBName, myDB));
+		}
+		
+		@Override
 		protected void onPostExecute(Void foo) {
-			// Log.v(TAG, "onPostExecute()");
+			 //Log.v(TAG, "onPostExecute(), closing " + myDBName );
 
 			mProgress.setVisibility(View.INVISIBLE);
 			//mListDetail.startAnimation(mSlideOut);
@@ -301,6 +305,7 @@ public class LocationFragmentHelper {
 			}
 			//close the database
 			mDatabaseHelper.CloseDB(myDB);
+			myDB = null;
 		}
 	}
 	

@@ -52,6 +52,8 @@ public class FavFragmentHelper {
 
 	private Context mContext;
 	private DatabaseHelper mDatabaseHelper;
+	private SQLiteDatabase myDB;
+	private String curDB;
 
 	// Need to store some stuff in an array, so we can sort by distance
 	class StopLocn {
@@ -157,7 +159,8 @@ public class FavFragmentHelper {
 			
 			for (String myDBName : mActiveDB) {
 				//Log.e(TAG, "Running on database: " + myDBName);
-				SQLiteDatabase myDB = mDatabaseHelper.ReadableDB(myDBName, null);
+				myDB = mDatabaseHelper.ReadableDB(myDBName, null);
+				curDB = myDBName;
 				String[] mStopIdArray = new String[mStops.length];
 				
 				for (int i = 0; i < mStops.length; i++) {
@@ -217,6 +220,11 @@ public class FavFragmentHelper {
 			return null;
 		}
 
+		@Override
+		protected void onCancelled() {
+			mDatabaseHelper.CloseDB(mDatabaseHelper.ReadableDB(curDB, myDB));
+		}
+		
 		@Override
 		protected void onPostExecute(Void foo) {
 			// Log.v(TAG, "onPostExecute()");

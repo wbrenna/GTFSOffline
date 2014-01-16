@@ -366,11 +366,11 @@ public class MainActivity extends FragmentActivity implements
 	 * one of the sections/tabs/pages.
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
-		private final FragmentManager mFragmentManager;
+		//private final FragmentManager mFragmentManager;
 
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
-			mFragmentManager = fm;
+			//mFragmentManager = fm;
 		}
 
 		@Override

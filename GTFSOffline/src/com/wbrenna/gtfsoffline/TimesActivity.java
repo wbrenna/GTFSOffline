@@ -123,7 +123,7 @@ public class TimesActivity extends ListActivity {
 			//mProgress.setVisibility(View.VISIBLE);
 			
 			//Set up the database
-			mDB = DBHelper.ReadableDB(mDBName, null);
+			//mDB = DBHelper.ReadableDB(mDBName, null);
 		}
 
 		// Update the progress bar.
@@ -161,6 +161,7 @@ public class TimesActivity extends ListActivity {
 			}
 			
 			// Make sure we actually have some valid data, since schedules change often.
+			mDB = DBHelper.ReadableDB(mDBName, null);
 			if (!mCalendarChecked) {
 				mCalendarOK = CheckCalendar(datenow);
 			}
@@ -204,7 +205,8 @@ public class TimesActivity extends ListActivity {
 				}
 
 			}
-
+			DBHelper.CloseDB(mDB);
+			
 			// Find when the next bus leaves
 			int savedpos = -1;
 			for (int i = 0; i < mListDetails.size(); i++) {
@@ -304,7 +306,7 @@ public class TimesActivity extends ListActivity {
 			msg.show();
 
 			//Close the database
-			DBHelper.CloseDB(mDB);
+			//DBHelper.CloseDB(mDB);
 		}
 	}
 

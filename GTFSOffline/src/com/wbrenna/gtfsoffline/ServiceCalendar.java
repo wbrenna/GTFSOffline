@@ -365,10 +365,12 @@ public class ServiceCalendar {
 				csr2.close();
 				
 			}
+			//mDatabaseHelper.CloseDB(mDB);
 			return results;
 		}
 		else
 		{
+			//mDatabaseHelper.CloseDB(mDB);
 			// No buses in the next "timelimit" (hour)!
 			return null;
 		}
@@ -485,10 +487,12 @@ public class ServiceCalendar {
 				csr2.close();
 				
 			}
+			//mDatabaseHelper.CloseDB(mDB);
 			return results;
 		}
 		else
 		{
+			//mDatabaseHelper.CloseDB(mDB);
 			// No buses in the next "timelimit" (hour)!
 			return null;
 		}
@@ -563,6 +567,7 @@ public class ServiceCalendar {
 			more = csr.moveToNext();
 		}
 		csr.close();
+		//mDatabaseHelper.CloseDB(mDB);
 		
 		// Find when the next bus leaves
 		/*for (int i = 0; i < listdetails.size(); i++) {
