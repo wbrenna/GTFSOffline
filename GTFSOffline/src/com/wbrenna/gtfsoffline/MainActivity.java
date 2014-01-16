@@ -78,6 +78,7 @@ public class MainActivity extends FragmentActivity implements
 	public static String[] mDBActive = null;
 	public static DatabaseHelper dbHelper = null;
 	public static Set<String> mDBList;
+	public static Set<String> mDBListPrefsOld;
 	
 	public static Location mLocation = null;
 	public static LocationListener locationListener = null;
@@ -104,6 +105,7 @@ public class MainActivity extends FragmentActivity implements
 		
 		Set<String> initial_preferences = mPrefs.getStringSet(getString(R.string.pref_dbs), 
 											emptyString);
+		mDBListPrefsOld = initial_preferences;
 		
 		//this is the list of currently checked databases
 		String[] tmpDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
@@ -204,57 +206,53 @@ public class MainActivity extends FragmentActivity implements
 		Set<String> initial_preferences = mPrefs.getStringSet(getString(R.string.pref_dbs), 
 											emptyString);
 		
-		//this is the list of currently checked databases
-		mDBActive = null;
-		//just to nullify the previous one.
-		if (initial_preferences.size() == 0) {
-			//mDBActive = null;
-			//already null
-		} else {
-			String[] tmpDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
-			dbHelper.gatherFiles();
-			mDBList = dbHelper.GetListofDB();
-			List<String> workingDBList = new ArrayList<String>();
-			
-			for (int i=0; i < tmpDBActive.length; i++) {
-				if ( mDBList.contains(tmpDBActive[i]) )
+		if( !initial_preferences.equals(mDBListPrefsOld)) {
+		
+			mDBListPrefsOld = initial_preferences;
+			//this is the list of currently checked databases
+			mDBActive = null;
+			//just to nullify the previous one.
+			if (initial_preferences.size() == 0) {
+				//mDBActive = null;
+				//already null
+			} else {
+				String[] tmpDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
+				dbHelper.gatherFiles();
+				mDBList = dbHelper.GetListofDB();
+				List<String> workingDBList = new ArrayList<String>();
+				
+				for (int i=0; i < tmpDBActive.length; i++) {
+					if ( mDBList.contains(tmpDBActive[i]) )
+					{
+						workingDBList.add(tmpDBActive[i]);
+					}
+				}
+				if (workingDBList.size() == 0)
 				{
-					workingDBList.add(tmpDBActive[i]);
+					mDBActive = null;
+				} else {
+					mDBActive = workingDBList.toArray(new String[workingDBList.size()]);
 				}
 			}
-			if (workingDBList.size() == 0)
-			{
-				mDBActive = null;
-			} else {
-				mDBActive = workingDBList.toArray(new String[workingDBList.size()]);
-			}
-		}
-
-		
-		mSectionsPagerAdapter.notifyDataSetChanged();
-		
-		//and create the appropriate tabs
-		final ActionBar actionBar = getActionBar();
-		if ( actionBar.getTabCount() < mSectionsPagerAdapter.getCount() ) {
+	
+			
+			mSectionsPagerAdapter.notifyDataSetChanged();
+			
+			//and create the appropriate tabs
+			final ActionBar actionBar = getActionBar();
+	
 			actionBar.removeAllTabs();
 			for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
 				actionBar.addTab(actionBar.newTab()
 						.setText(mSectionsPagerAdapter.getPageTitle(i))
 						.setTabListener(this));
+	
 			}
 		}
-		else if (actionBar.getTabCount() > mSectionsPagerAdapter.getCount()) {
-			actionBar.removeAllTabs();
-			for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-				actionBar.addTab(actionBar.newTab()
-						.setText(mSectionsPagerAdapter.getPageTitle(i))
-						.setTabListener(this));
-			}
-		}
+		
 		//restart location manager
 		//mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 		mLocationHelper.refresh(locationListener);
-		
 		
 	}
 	
