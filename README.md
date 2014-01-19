@@ -55,13 +55,15 @@ and you can select them from the Settings menu. The other settings should be fai
 
 If the app slows down considerably, you might try reducing the time it looks ahead for buses, the number
 of buses at each stop, and/or the number of stops. You could also reduce the number of databases used.
+In addition, the Search Window preference will only search within an x-kilometer square. Decreasing this
+will dramatically speed up the app. When it is set to zero, it will search far and wide for buses!
 
 You also must be sure to update your database regularly. Often a stale database will clog up the app,
 as it will search through every entry trying to find one that is within the time range.
+When a database expires, the app should notify you.
 
 TODO
 -------------------------
 
 * The database handling could be much faster. 
-* A vibrate on approaching bus preference.
 * Automatically download *.db.gz files.
