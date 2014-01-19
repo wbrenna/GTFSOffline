@@ -108,8 +108,6 @@ public class TimesActivity extends ListActivity {
 	private class ProcessBusTimes extends AsyncTask<Void, Integer, Integer> {
 		//static final String TAG = "ProcessBusTimesAsync";
 
-		// TODO -- should set a listener that will call this callback.
-
 		// A callback from CalendarService, for updating our progress bar
 		//@Override
 		//public void notificationCallback(Integer progress) {
@@ -141,8 +139,6 @@ public class TimesActivity extends ListActivity {
 			t.setToNow();
 			final String timenow;
 
-			//TODO: Check this month + 1 thing...
-			//final String datenow = String.format("%04d%02d%02d", t.year, t.month + 1, t.monthDay);
 			final String datenow;
 			
 			if (t.hour <= 5) {
@@ -176,8 +172,6 @@ public class TimesActivity extends ListActivity {
 				mListDetails = aSC.getRouteDepartureTimes(mStop_id, datenow,
 						showAllTrips, mDB);
 			} else {
-
-				// TODO Setting a listener means not passing `this'
 
 				//convert trip id to route id
 				final String q = "select distinct route_id from trips where trip_id = ? ";
@@ -254,11 +248,7 @@ public class TimesActivity extends ListActivity {
 								R.layout.row2layout, ampmflag, mListDetails);
 				mContext.setListAdapter(adapter);
 			} else {
-				// TODO should be route_short_name?
 				mTitle.setText(mRoute_id + " - " + mHeadsign);
-				//if (tv != null) {
-					//tv.setText(R.string.tap_time_for_trip);
-				//}
 				final ListArrayAdapter adapter = new ListArrayAdapter(mContext, 
 								R.layout.rowlayout, ampmflag, mListDetails);
 				mContext.setListAdapter(adapter);

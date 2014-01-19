@@ -178,7 +178,6 @@ public class ServiceCalendar {
 			return null;
 		}
 
-		//TODO: need to fix this now that hours are simplified
 		// First check the cache
 		if (limittotoday) {
 			if (truemap.containsKey(service_id + date)) {
@@ -418,10 +417,6 @@ public class ServiceCalendar {
 			date = String.format("%04d%02d%02d", t.year, t.month+1, t.monthDay);
 		}
 
-		//TODO: need to use the date as previous day for correct weekend service, etc.
-		//this could be handled earlier in holiday days etc.
-		
-		
 		final String[] selectargs = new String[] { stopid, timenow, timelimit };
 		mDB = mDatabaseHelper.ReadableDB(mDBName, mDB);
 		if( mDB == null )
@@ -540,10 +535,6 @@ public class ServiceCalendar {
 			date = String.format("%04d%02d%02d", t.year, t.month+1, t.monthDay);
 		}
 
-		//TODO: need to use the date as previous day for correct weekend service, etc.
-		//this could be handled earlier in holiday days etc.
-		
-		
 		final String[] selectargs = new String[] { stopid, timenow, timelimit, routeid, headsign };
 		final Cursor csr = mDatabaseHelper.ReadableDB(mDBName, mDB).rawQuery(q, selectargs);
 		
@@ -608,8 +599,7 @@ public class ServiceCalendar {
 			final String trip_id = csr.getString(1);
 			final String daysstr = getTripDaysofWeek(trip_id, date, !dontlimittotoday);
 
-			// Only add if the bus runs on this day.
-			//TODO: Fix this
+			// Only add if the bus runs on the correct day.
 			if (daysstr != null) {
 				listdetails.add(new String[] { csr.getString(0), daysstr, csr.getString(2), csr.getString(3) });
 			}
@@ -752,9 +742,6 @@ public class ServiceCalendar {
 		while (hourdiff >= 24) {
 			hourdiff = hourdiff - 24;
 		}
-		
-		//TODO: fix this for the merge case where we want to find tomorrow morning's
-		//buses or the previous buses.
 		
 		if(hourdiff < 0) {
 			hourdiff = hourdiff + 24;

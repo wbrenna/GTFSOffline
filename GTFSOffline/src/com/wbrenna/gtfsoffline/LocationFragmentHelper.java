@@ -195,7 +195,6 @@ public class LocationFragmentHelper {
 				}
 				csr.close();
 			}
-//TODO This can be optimized (later!) !!
 			
 			// Calculate the distance to each point in the array
 			final float[] results = new float[2];

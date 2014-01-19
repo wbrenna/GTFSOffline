@@ -31,9 +31,8 @@ public class LocationHelper {
 	
 	private static final String TAG = "LocationHelper";
 
-	private static final int MIN_LOCN_UPDATE_TIME = 10000; // ms
+	private static final int MIN_LOCN_UPDATE_TIME = 15000; // ms
 	private static final int MIN_LOCN_UPDATE_DIST = 10; // m
-	//TODO: make this a preference at some point
 
 	private LocationManager mLocationManager;
 	private Location mLocation;

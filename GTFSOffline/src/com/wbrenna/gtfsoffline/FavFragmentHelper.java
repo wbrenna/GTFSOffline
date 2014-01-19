@@ -212,7 +212,6 @@ public class FavFragmentHelper {
 							str[2], myDBName });
 					publishProgress(((int) ((++loopcounter / (float) favcounter) * 100)));
 				}
-				//TODO: this can be cleaned up a little! Maybe a better array type
 				
 				//close the database
 				mDatabaseHelper.CloseDB(myDB);
