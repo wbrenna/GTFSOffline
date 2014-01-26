@@ -95,7 +95,7 @@ public class FavFragmentHelper {
 		new ProcessBusStops().execute();
 	}
 
-	private void reloadPreferences() {
+	public void reloadPreferences() {
 		ampmflag = mPrefs.getBoolean(mContext.getString(R.string.pref_ampmtimes_key), false);
 		NUM_CLOSEST_STOPS = Integer.parseInt(mPrefs.getString(
 											mContext.getString(R.string.pref_num_closest_stops), "8"));

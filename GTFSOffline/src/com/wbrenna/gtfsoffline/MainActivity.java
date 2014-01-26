@@ -242,7 +242,6 @@ public class MainActivity extends FragmentActivity implements
 					mDBActive = workingDBList.toArray(new String[workingDBList.size()]);
 				}
 			}
-	
 			
 			mSectionsPagerAdapter.notifyDataSetChanged();
 			
@@ -292,6 +291,20 @@ public class MainActivity extends FragmentActivity implements
 							//aFragment.updateDisplay();
 
 						}
+						
+					}
+				}
+				else if (i==0) {
+					FavSectionFragment aFavFragment = (FavSectionFragment) getSupportFragmentManager().
+							findFragmentByTag("android:switcher:"+R.id.pager+":"+Integer.toString(i));
+					if (aFavFragment != null) {
+						//getSupportFragmentManager().beginTransaction().remove(aFavFragment).commit();
+						//mSectionsPagerAdapter.notifyDataSetChanged();
+						//if (aFavFragment.getView() != null) {
+							//aFavFragment.updateDisplay();
+
+						//}
+						aFavFragment.updatePositions();
 						
 					}
 				}
@@ -539,6 +552,10 @@ public class MainActivity extends FragmentActivity implements
 			this.getActivity().startActivity(routes);
 		}
 		
+		public void updatePositions() {
+			mFavFragHelper.reloadPreferences();
+			mFavFragHelper.runProcess();
+		}
 		
 	}
 
