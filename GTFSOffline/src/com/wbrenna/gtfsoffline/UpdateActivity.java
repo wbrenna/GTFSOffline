@@ -46,283 +46,76 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class UpdateActivity {
-	private static final String TAG = "StartupActivity";
+public class UpdateActivity extends Activity {
+	private static final String TAG = "UpdateActivity";
 
 	protected Activity mContext;
-	protected TextView mTitle;
-	protected ProgressBar mProgress;
+	//protected TextView mTitle;
+	//protected ProgressBar mProgress;
 
-	private static String DBVersionURL = "http://wbrenna.ca/GRT.db.version";
-	private static String DBDatabaseURL = "http://wbrenna.ca/GRT.db.gz";
 
-	//private static String DBList = "http://wbrenna.ca/gdrivefilelist.txt";
-	
-	private static String DB_PATH;
-	private static NewDBVersion DBV = null;
-
-	public void runUpdater() {
+//	public void runUpdater() {
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 		//new LatestDB().execute();
+		mContext = this;
+		
+		TextView text = new TextView(mContext);
+		text.setText("Copying *.db.gz in background! You may close this window.");
+		//setContentView(text);
+		
+		Button btn_close = new Button(mContext);
+		btn_close.setText("OK");
+		btn_close.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				mContext.finish();
+			}
+		});
+		
+		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
+				LayoutParams.WRAP_CONTENT);
+		//LinearLayout layout = new LinearLayout(mContext);
+		LinearLayout mainlayout = new LinearLayout(mContext);
+		mainlayout.setOrientation(LinearLayout.VERTICAL);
+		mainlayout.addView(text, params);
+		mainlayout.addView(btn_close, params);
+		setContentView(mainlayout);
+		
 		new DBMover().execute();
 	}
 
-
-	/* Do networking stuff off the main thread. */
-	private class LatestDB extends AsyncTask<SQLiteDatabase, Void, Void> {
-
-		private int newdbv = -1, olddbv = -1;
-
-		@Override
-		protected Void doInBackground(SQLiteDatabase... theDatabase) {
-			DBV = new NewDBVersion();
-			newdbv = DBV.getDBVersion();
-			DatabaseHelper aDBHelper = new DatabaseHelper(mContext);
-			olddbv = aDBHelper.GetDBVersion("",theDatabase[0]);
-
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void foo) {
-
-			/* If versions match, or we can't check the new version, just continue. */
-			if ((newdbv > 0 && olddbv > 0 && newdbv == olddbv) || (newdbv < 0)) {
-				//startFavstops();
-				return;
-			}
-
-			final DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int id) {
-					switch (id) {
-					case DialogInterface.BUTTON_POSITIVE:
-						new DBDownloader().execute();
-						break;
-					case DialogInterface.BUTTON_NEGATIVE:
-						if (olddbv < 0) {
-							mContext.finish();
-							return;
-						}
-						//startFavstops();
-						return;
-					}
-					dialog.cancel();
-				}
-			};
-
-			final String sizestr = mContext.getString(R.string.db_download_now, DBV.getSize());
-			final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-			builder.setTitle(R.string.db_new_avail);
-			builder.setMessage(sizestr).setPositiveButton(R.string.yes, listener)
-			.setNegativeButton(R.string.no, listener);
-			builder.create();
-			builder.show();
-		}
-	}
-
-	/**
-	 * Check what the latest version of the database on the website is. Reads a file that contains 3 fields: integer version,
-	 * string (of a float) approximate size (in megs), and the md5sum of the uncompressed db.
-	 */
-	private class NewDBVersion {
-
-		protected int DBVersion = -1;
-		protected float DBsize = 0.0f;
-		protected String DBmd5 = null;
-
-		public NewDBVersion()
-		{
-			final HttpClient client = new DefaultHttpClient();
-			final HttpGet httpGet = new HttpGet(DBVersionURL);
-
-			try {
-				final HttpResponse response = client.execute(httpGet);
-				final StatusLine statusLine = response.getStatusLine();
-				final int statusCode = statusLine.getStatusCode();
-
-				if (statusCode == 200) {
-					final HttpEntity responseEntity = response.getEntity();
-					final String s = EntityUtils.toString(responseEntity);
-
-					DBVersion = Integer.parseInt(s.substring(0, s.indexOf(' ')));
-
-					DBsize = Float.parseFloat(s.substring(s.indexOf(' ') + 1, s.lastIndexOf(' ')));
-
-					if (s.endsWith("\n")) {
-						DBmd5 = s.substring(s.lastIndexOf(' ') + 1, s.length() - 1);
-					} else {
-						DBmd5 = s.substring(s.lastIndexOf(' ') + 1);
-					}
-				}
-			} catch (final ClientProtocolException e) {
-				// TODO Auto-generated catch block
-			} catch (final IOException e) {
-				// TODO Auto-generated catch block
-			} catch (final NumberFormatException e) {
-				// TODO Auto-generated catch block
-			} catch (final Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		public int getDBVersion()
-		{
-			return DBVersion;
-		}
-
-		public float getSize()
-		{
-			return DBsize;
-		}
-
-		public String getDBmd5()
-		{
-			return DBmd5;
-		}
-	}
-
-	/**
-	 * Copies database from local assets-folder to the system folder, from where it can be accessed and handled. This is done by
-	 * transferring bytestream. Note that this class must be public static, since it's embedded in the outer class. If it's not
-	 * static, starting the service will fail.
-	 **/
-	private class DBDownloader extends AsyncTask<SQLiteDatabase, Integer, Void> {
-
-		private boolean alliswell = false;
-
-		@Override
-		protected void onPreExecute() {
-			mTitle.setText(R.string.db_downloading);
-		}
-
-		@Override
-		protected void onProgressUpdate(Integer... parms) {
-			mProgress.setProgress(parms[0]);
-		}
-
-		@Override
-		protected Void doInBackground(SQLiteDatabase... myDBarr) {
-
-			DatabaseHelper aDBHelper = new DatabaseHelper(mContext);
-			aDBHelper.CloseDB(myDBarr[0]);
-
-			byte[] digest = null;
-
-			try {
-				final HttpClient client = new DefaultHttpClient();
-				final HttpGet httpGet = new HttpGet(DBDatabaseURL);
-
-				final HttpResponse response = client.execute(httpGet);
-
-				final StatusLine statusLine = response.getStatusLine();
-				final int statusCode = statusLine.getStatusCode();
-				if (statusCode == 200) {
-					final FileOutputStream myOutput = new FileOutputStream(DB_PATH + ".new");
-					final byte[] buffer = new byte[8 * 1024];
-
-					final HttpEntity entity = response.getEntity();
-					final InputStream content = entity.getContent();
-
-					// Remote file is zipped, but md5sum is of the uncompressed file.
-					final GZIPInputStream zis = new GZIPInputStream(content);
-					final MessageDigest md = MessageDigest.getInstance("MD5");
-					final DigestInputStream dis = new DigestInputStream(zis, md);
-
-					int count, DBtotal = 0;
-					final float tot = DBV.getSize() * 1024 * 1024 * 5.0f; // assume roughly 5 to 1 compression
-					while ((count = dis.read(buffer, 0, buffer.length)) > 0) {
-						DBtotal += count;
-						myOutput.write(buffer, 0, count);
-						publishProgress((int) ((DBtotal / tot) * 100.0f));
-					}
-
-					myOutput.flush();
-					myOutput.close();
-
-					digest = md.digest();
-				}
-
-				// Did it get munged on the way?
-				final StringBuffer sb = new StringBuffer();
-				for (final byte element : digest) {
-					// Force in a leading zero if required, and watch out for sign extensions....
-					sb.append(Integer.toHexString((element & 0xFF) | 0x100).substring(1, 3));
-				}
-				if (!sb.toString().equals(DBV.getDBmd5())) {
-					throw new IOException();
-				}
-
-				final File o = new File(DB_PATH);
-				final File n = new File(DB_PATH + ".new");
-				o.delete();
-				n.renameTo(o);
-
-				alliswell = true;
-
-			} catch (final FileNotFoundException e) {
-				Log.e(TAG, "FileNotFoundException exception");
-				e.printStackTrace();
-			} catch (final IOException e) {
-				Log.e(TAG, "IOException exception");
-				e.printStackTrace();
-			} catch (final Exception e) {
-				Log.e(TAG, "unknown exception exception");
-				e.printStackTrace();
-			}
-
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void foo) {
-
-			if (alliswell) {
-				//startFavstops();
-				return;
-			}
-
-			final DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int id) {
-					switch (id) {
-					case DialogInterface.BUTTON_NEGATIVE:
-						mContext.finish();
-						return;
-					}
-					dialog.cancel();
-					//startFavstops();
-					return;
-				}
-			};
-
-			final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-			builder.setTitle(R.string.db_is_corrupt)
-			.setMessage(R.string.corrupt_exit)
-			.setPositiveButton(R.string.cntinue, listener)
-			.setNegativeButton(R.string.exit, listener)
-			.create()
-			.show();
-		}
-	}
 	
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+
 	private class DBMover extends AsyncTask<Void, Integer, Void> {
 
 		private boolean alliswell = false;
 
 		@Override
 		protected void onPreExecute() {
-			mTitle.setText(R.string.db_copying);
+			//mTitle.setText(R.string.db_copying);
 		}
 
 		@Override
 		protected void onProgressUpdate(Integer... parms) {
-			mProgress.setProgress(parms[0]);
+			//mProgress.setProgress(parms[0]);
 		}
 
 		@Override
@@ -338,17 +131,24 @@ public class UpdateActivity {
 			
 			FilenameFilter dbgzFilter = new FilenameFilter() {
 				public boolean accept(File dir, String name) {
+					Log.v(TAG,"File found: " + name);
 					return name.endsWith(".db.gz");
 				}
 			};
-			
+			Log.v(TAG,"Download folder is: " + downloadFolder.getName());
 			File[] downloadStrings = downloadFolder.listFiles(dbgzFilter);
+			
+			//int dwLength = downloadStrings.length;
+			//int DBtotal = 0;
+			//Toast.makeText(mContext, "Copying, please wait.", Toast.LENGTH_LONG).show();
 			
 			
 			for(File theFile : downloadStrings ) {
 				try {
+					final int lastDot = theFile.getName().lastIndexOf('.');
 					final String fileCachePath = myCacheDirectory.getAbsolutePath() + 
-							theFile.getName().substring(0, -3) +  ".new";
+							theFile.getName().substring(0, lastDot) +  ".new";
+					Log.v(TAG, theFile.getName());
 					final FileOutputStream myOutput = new FileOutputStream(
 							fileCachePath);
 					final int chunkSize = 8*1024;
@@ -359,13 +159,13 @@ public class UpdateActivity {
 					// Remote file is zipped, but md5sum is of the uncompressed file.
 					final GZIPInputStream zis = new GZIPInputStream(myInput);
 	
-					int count, DBtotal = 0;
-					final float tot = DBV.getSize() * 1024 * 1024 * 5.0f; // assume roughly 5 to 1 compression
+					int count = 0;
+					//final float tot = DBV.getSize() * 1024 * 1024 * 5.0f; // assume roughly 5 to 1 compression
 					
 					while ((count = zis.read(buffer, 0, chunkSize)) > 0) {
-						DBtotal += count;
+						//DBtotal += count;
 						myOutput.write(buffer, 0, count);
-						publishProgress((int) ((DBtotal / tot) * 100.0f));
+						//publishProgress((int) ((DBtotal / dwLength) * 100.0f));
 					}
 					zis.close();
 					
@@ -373,12 +173,13 @@ public class UpdateActivity {
 					myOutput.close();
 	
 	
-					final File o = new File(myFilesFile + theFile.getName().substring(0, -3));
+					final File o = new File(myFilesFile + "/" + 
+							theFile.getName().substring(0, lastDot));
 					final File n = new File(fileCachePath);
 					o.delete();
 					n.renameTo(o);
-		
-					alliswell = true;
+	
+					//DBtotal++;
 	
 				} catch (final FileNotFoundException e) {
 					Log.e(TAG, "FileNotFoundException exception");
@@ -392,7 +193,7 @@ public class UpdateActivity {
 				}
 				
 			}
-
+			alliswell = true;
 			return null;
 		}
 
@@ -401,6 +202,8 @@ public class UpdateActivity {
 
 			if (alliswell) {
 				//startFavstops();
+				Log.v(TAG,"Finished copying stops!");
+				//Toast.makeText(mContext, "Finished!", Toast.LENGTH_LONG).show();
 				return;
 			}
 

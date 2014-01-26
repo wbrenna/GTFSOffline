@@ -38,13 +38,14 @@
         android:key="@string/pref_grid_size_key"
         android:entryValues="@array/GridSizeKm"
         android:entries="@array/GridSizeKm"
+        android:summary="Only look for bus stops within this range."
         android:title="@string/grid_size" />
     
     
     <MultiSelectListPreference
         android:key="@string/pref_dbs"
         android:title="@string/use_dbs"
-        android:summary="Databases to select"
+        android:summary="Activate databases (one tab each)."
         android:defaultValue="@array/empty_array" />
 
 </PreferenceScreen>
