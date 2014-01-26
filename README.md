@@ -4,7 +4,7 @@ GTFSOffline
 Description
 -------------------------
 
-GTFSOffline is a transit app for Android >= 4.4,
+GTFSOffline is a transit app for Android >= 4.0,
 forked from <a href="http://github.com/gdmalet/grtransit">GRTransit</a>,
 an excellent transit app for the Grand River Transit bus system.
 
@@ -19,23 +19,21 @@ Features
 
 * Flexibility to load as many or as few databases as you want
 * 100% completely offline operation
-* Permissions required: only GPS coarse/fine, nothing else
+* Permissions required: only GPS coarse/fine, Write External Storage (to read Downloads folder for downloaded databases)
 * Open source GPLv3 Licensed
 
 
 Guide (Process DB on Linux)
 -------------------------
 
-It is currently under development, so hang on
-until I get this stable and working properly!
+* Install from the Play Store: https://play.google.com/store/apps/details?id=com.wbrenna.gtfsoffline.
 
+* Install the apk found in GTFSOffline/bin/GTFSOffline.apk as per http://www.maketecheasier.com/install-applications-without-the-market/.
 
-Install the apk found in GTFSOffline/bin/GTFSOffline.apk as per
-http://www.maketecheasier.com/install-applications-without-the-market/.
 
 You will need to find the GTFS zip files for the transit agenc[y,ies] you use.
 Hopefully these are distributed online.
-Unzip these files into their own folders in the data/ directory.
+On your desktop computer, unzip these files into their own folders in the data/ directory of this repository (after cloning it).
 For each folder, do something like:
 ```
 cd path-to-gtfsoffline/data/
@@ -53,6 +51,12 @@ When this is done, simply transfer the databases to your phone, into the folder
 The app will detect the files (sometimes the phone needs to be restarted - an AOSP bug, not mine)
 and you can select them from the Settings menu. The other settings should be fairly self explanatory!
 
+Alternatively, you can GZip the file and put it on a server, Google Drive, etc., and download it to the
+phone's Downloads folder, then run ```Scan Downloads Folder``` from within the app (it will gunzip the
+*.db.gz database and move it to the appropriate folder).
+
+Then, select the databases you wish to activate in the Settings menu.
+
 If the app slows down considerably, you might try reducing the time it looks ahead for buses, the number
 of buses at each stop, and/or the number of stops. You could also reduce the number of databases used.
 In addition, the Search Window preference will only search within an x-kilometer square. Decreasing this
@@ -66,4 +70,3 @@ TODO
 -------------------------
 
 * The database handling could be much faster. 
-* Automatically download *.db.gz files.
