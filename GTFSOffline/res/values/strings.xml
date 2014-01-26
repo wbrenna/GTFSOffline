@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">GTFSOffline</string>
+    <string name="action_dbmover">Scan Downloads Folder</string>
     <string name="action_settings">Settings</string>
     <string name="favs">Favourites</string>
     <string name="routestitle">Routes List</string>
@@ -41,6 +42,7 @@
     <string name="cntinue">Continue</string>
     <string name="corrupt_exit">If you continue things may go downhill fast.</string>
     <string name="db_is_awol">Unable to open the schedule database.</string>
+    <string name="db_copying">Searching and moving *.db.gz files...</string>
     <string name="db_download_now">Download %1$1.1f megs now?</string>
     <string name="db_downloading">Downloading the schedule database</string>
     <string name="db_is_corrupt">The new database is corrupt or incomplete.</string>

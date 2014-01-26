@@ -21,8 +21,10 @@
 package com.wbrenna.gtfsoffline;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.DigestInputStream;
@@ -40,9 +42,11 @@ import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -57,13 +61,14 @@ public class UpdateActivity {
 	private static String DBVersionURL = "http://wbrenna.ca/GRT.db.version";
 	private static String DBDatabaseURL = "http://wbrenna.ca/GRT.db.gz";
 
-	private static String DBList = "http://wbrenna.ca/gdrivefilelist.txt";
+	//private static String DBList = "http://wbrenna.ca/gdrivefilelist.txt";
 	
 	private static String DB_PATH;
 	private static NewDBVersion DBV = null;
 
 	public void runUpdater() {
-		new LatestDB().execute();
+		//new LatestDB().execute();
+		new DBMover().execute();
 	}
 
 
@@ -96,7 +101,7 @@ public class UpdateActivity {
 				public void onClick(DialogInterface dialog, int id) {
 					switch (id) {
 					case DialogInterface.BUTTON_POSITIVE:
-						new DBCopier().execute();
+						new DBDownloader().execute();
 						break;
 					case DialogInterface.BUTTON_NEGATIVE:
 						if (olddbv < 0) {
@@ -187,7 +192,7 @@ public class UpdateActivity {
 	 * transferring bytestream. Note that this class must be public static, since it's embedded in the outer class. If it's not
 	 * static, starting the service will fail.
 	 **/
-	private class DBCopier extends AsyncTask<SQLiteDatabase, Integer, Void> {
+	private class DBDownloader extends AsyncTask<SQLiteDatabase, Integer, Void> {
 
 		private boolean alliswell = false;
 
@@ -269,6 +274,123 @@ public class UpdateActivity {
 			} catch (final Exception e) {
 				Log.e(TAG, "unknown exception exception");
 				e.printStackTrace();
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void foo) {
+
+			if (alliswell) {
+				//startFavstops();
+				return;
+			}
+
+			final DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int id) {
+					switch (id) {
+					case DialogInterface.BUTTON_NEGATIVE:
+						mContext.finish();
+						return;
+					}
+					dialog.cancel();
+					//startFavstops();
+					return;
+				}
+			};
+
+			final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+			builder.setTitle(R.string.db_is_corrupt)
+			.setMessage(R.string.corrupt_exit)
+			.setPositiveButton(R.string.cntinue, listener)
+			.setNegativeButton(R.string.exit, listener)
+			.create()
+			.show();
+		}
+	}
+	
+	private class DBMover extends AsyncTask<Void, Integer, Void> {
+
+		private boolean alliswell = false;
+
+		@Override
+		protected void onPreExecute() {
+			mTitle.setText(R.string.db_copying);
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... parms) {
+			mProgress.setProgress(parms[0]);
+		}
+
+		@Override
+		protected Void doInBackground(Void... foo) {
+			
+			File myCacheDirectory = mContext.getExternalCacheDir();
+			DatabaseHelper mDBHelper = new DatabaseHelper(mContext);
+			String myFilesDirectory = mDBHelper.GetDBPath();
+			File myFilesFile = new File(myFilesDirectory);
+			
+			File downloadFolder = Environment.getExternalStoragePublicDirectory
+					(Environment.DIRECTORY_DOWNLOADS);
+			
+			FilenameFilter dbgzFilter = new FilenameFilter() {
+				public boolean accept(File dir, String name) {
+					return name.endsWith(".db.gz");
+				}
+			};
+			
+			File[] downloadStrings = downloadFolder.listFiles(dbgzFilter);
+			
+			
+			for(File theFile : downloadStrings ) {
+				try {
+					final String fileCachePath = myCacheDirectory.getAbsolutePath() + 
+							theFile.getName().substring(0, -3) +  ".new";
+					final FileOutputStream myOutput = new FileOutputStream(
+							fileCachePath);
+					final int chunkSize = 8*1024;
+					final byte[] buffer = new byte[chunkSize];
+					final FileInputStream myInput = new FileInputStream(theFile);
+					
+	
+					// Remote file is zipped, but md5sum is of the uncompressed file.
+					final GZIPInputStream zis = new GZIPInputStream(myInput);
+	
+					int count, DBtotal = 0;
+					final float tot = DBV.getSize() * 1024 * 1024 * 5.0f; // assume roughly 5 to 1 compression
+					
+					while ((count = zis.read(buffer, 0, chunkSize)) > 0) {
+						DBtotal += count;
+						myOutput.write(buffer, 0, count);
+						publishProgress((int) ((DBtotal / tot) * 100.0f));
+					}
+					zis.close();
+					
+					myOutput.flush();
+					myOutput.close();
+	
+	
+					final File o = new File(myFilesFile + theFile.getName().substring(0, -3));
+					final File n = new File(fileCachePath);
+					o.delete();
+					n.renameTo(o);
+		
+					alliswell = true;
+	
+				} catch (final FileNotFoundException e) {
+					Log.e(TAG, "FileNotFoundException exception");
+					e.printStackTrace();
+				} catch (final IOException e) {
+					Log.e(TAG, "IOException exception");
+					e.printStackTrace();
+				} catch (final Exception e) {
+					Log.e(TAG, "unknown exception exception");
+					e.printStackTrace();
+				}
+				
 			}
 
 			return null;

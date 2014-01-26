@@ -336,6 +336,11 @@ public class MainActivity extends FragmentActivity implements
 			mFragmentTransaction.commit();
 			**/
 			break;
+		case R.id.action_movedb:
+			//launch UpdateActivity
+			Intent j = new Intent(this, UpdateActivity.class);
+			startActivity(j);
+			break;
 		}
 		return true;
 	}
