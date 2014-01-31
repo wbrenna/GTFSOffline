@@ -129,8 +129,10 @@ do
 	    ;;
     routes.txt|trips.txt)
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
-	    columns=$(cat $file | tr -d '\015' | sed -e '1 s/^\xef\xbb\xbf//' | head -n 1)
-	    tail -n +2 "$file" > $tmpfile
+	    #columns=$(cat $file | tr -d '\015' | sed -e '1 s/^\xef\xbb\xbf//' | head -n 1)
+	    columns=$(cat $file | head -n 1 | tr -d '\015' | sed -e '1 s/^\xef\xbb\xbf//')
+	    #tail -n +2 "$file" | tr '\r' '\n' > $tmpfile
+	    tail -n +2 "$file" | tr -d '\015' > $tmpfile
 	    (
 		echo "create table $table($columns);"
 		echo ".separator ,"
@@ -156,6 +158,7 @@ do
     shift
 done
 
+echo "Checking for missing calendar_dates.txt or calendar.txt..."
 #This is not robust if some of these files don't exist. In particular, calendar_dates can be excluded. Handle that here:
 if ! $calendartest
 then
@@ -180,6 +183,7 @@ then
 	) | $SQ3 $DB.new
 fi
 
+echo "Creating indices..."
 $SQ3 $DB.new <<-EOT
   create index stops_stop_id on stops ( stop_id );
   create index routes_route_id on routes ( route_id );
@@ -206,6 +210,7 @@ EOT
 ###	****departure_time is now hhmmss, with NO COLONS - this enables sorting
 
 
+echo "Indices created. Renaming and cleaning up..."
 mv $DB $DB.old
 mv $DB.new $DB
 mv $DB.version $DB.version.old

@@ -39,6 +39,8 @@ public class LocationHelper {
 
 	private Context mContext;
 
+	private boolean gpsOn;
+	private boolean netOn;
 	
 
 
@@ -49,19 +51,31 @@ public class LocationHelper {
 	public Location startLocationManager() {
 
 		mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-		
 
+		//Just so it doesn't keep trying
+		gpsOn = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+		netOn = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+		if ( !gpsOn && !netOn ) {
+			Toast.makeText(mContext, R.string.no_location_providers, Toast.LENGTH_LONG).show();
+			return null;
+		}
+		
 		// Get a best guess of current location
 		Location nwlocn = null, gpslocn = null;
-		try {
-			nwlocn = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		} catch (final IllegalArgumentException e) {
-			Log.e(TAG, "Exception requesting last location from GPS_PROVIDER");
+		if (gpsOn) {
+			try {
+				nwlocn = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			} catch (final IllegalArgumentException e) {
+				Log.e(TAG, "Exception requesting last location from GPS_PROVIDER");
+			}
 		}
-		try {
-			gpslocn = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		} catch (final IllegalArgumentException e) {
-			Log.e(TAG, "Exception requesting last location from NETWORK_PROVIDER");
+		if (netOn) {
+			try {
+				gpslocn = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+			} catch (final IllegalArgumentException e) {
+				Log.e(TAG, "Exception requesting last location from NETWORK_PROVIDER");
+			}
 		}
 		if (isBetterLocation(gpslocn, nwlocn)) {
 			mLocation = gpslocn;

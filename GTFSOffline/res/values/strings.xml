@@ -67,6 +67,7 @@
     <string name="no">No</string>
     <string name="no_favourites">Use the search facility from the menu to find stops, or locate them on the map, and long-press to add them to your favourites list. Then a click shows all routes using that stop, and another shows the times.\n\nTo remove a favourite, long-press on the favourites list.</string>
     <string name="no_location_fix">No usable location fix! Searching....</string>
+    <string name="no_location_providers">No GPS/Network Location Providers found! This app will not work.</string>
     <string name="no_more_busses">No more buses today.</string>
     <string name="preferences">Preferences</string>
     <string name="pref_ampmtimes_key">ampmtimes</string>

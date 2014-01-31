@@ -150,7 +150,11 @@ public class LocationFragmentHelper {
 				//we tried!
 				return null;
 			}
-			
+			if (mLocation == null) {
+				//uh oh, no location yet!
+				//we'll trust the TOAST in LocationHelper to keep people aware of this.
+				return null;
+			}
 			double myLongitude = mLocation.getLongitude();
 			double myLatitude = mLocation.getLatitude();
 			double myTop = myLatitude + (180.0/Math.PI)*(grid_size/6378.1370);

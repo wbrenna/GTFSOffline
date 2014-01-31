@@ -214,107 +214,111 @@ public class MainActivity extends FragmentActivity implements
 		Set<String> initial_preferences = mPrefs.getStringSet(getString(R.string.pref_dbs), 
 											emptyString);
 		
-		if( !initial_preferences.equals(mDBListPrefsOld)) {
-		
-			mDBListPrefsOld = initial_preferences;
-			//this is the list of currently checked databases
-			mDBActive = null;
-			//just to nullify the previous one.
-			if (initial_preferences.size() == 0) {
-				//mDBActive = null;
-				//already null
-			} else {
-				String[] tmpDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
-				dbHelper.gatherFiles();
-				mDBList = dbHelper.GetListofDB();
-				List<String> workingDBList = new ArrayList<String>();
-				
-				for (int i=0; i < tmpDBActive.length; i++) {
-					if ( mDBList.contains(tmpDBActive[i]) )
-					{
-						workingDBList.add(tmpDBActive[i]);
-					}
-				}
-				if (workingDBList.size() == 0)
-				{
-					mDBActive = null;
+		//in case we're on a low-ram system and things aren't cached
+		try {
+			if( !initial_preferences.equals(mDBListPrefsOld)) {
+			
+				mDBListPrefsOld = initial_preferences;
+				//this is the list of currently checked databases
+				mDBActive = null;
+				//just to nullify the previous one.
+				if (initial_preferences.size() == 0) {
+					//mDBActive = null;
+					//already null
 				} else {
-					mDBActive = workingDBList.toArray(new String[workingDBList.size()]);
-				}
-			}
-			
-			mSectionsPagerAdapter.notifyDataSetChanged();
-			
-			//totally kill the viewPager and all, and recreate!
-			//mSectionsPagerAdapter = null;
-			//getFragmentManager().beginTransaction().replace(containerViewId, fragment);
-			//and create the appropriate tabs
-			final ActionBar actionBar = getActionBar();
-	
-			/**mSectionsPagerAdapter = new SectionsPagerAdapter(
-					getSupportFragmentManager());
-
-			// Set up the ViewPager with the sections adapter.
-			mViewPager = (ViewPager) findViewById(R.id.pager);
-			mViewPager.setAdapter(mSectionsPagerAdapter);
-
-			mViewPager
-					.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-						@Override
-						public void onPageSelected(int position) {
-							actionBar.setSelectedNavigationItem(position);
-						}
-					});**/
-			
-			actionBar.removeAllTabs();
-			for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-				actionBar.addTab(actionBar.newTab()
-						.setText(mSectionsPagerAdapter.getPageTitle(i))
-						.setTabListener(this));
-				
-				//update the fragment contents
-				/**if (i > 0 ) {
-					Fragment newFragment = new DBListFragment();
-					Bundle args = new Bundle();
-					args.putString(DBListFragment.DATABASE, mDBActive[i-1]);
-					newFragment.setArguments(args);
+					String[] tmpDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
+					dbHelper.gatherFiles();
+					mDBList = dbHelper.GetListofDB();
+					List<String> workingDBList = new ArrayList<String>();
 					
-					getFragmentManager().beginTransaction().replace(i, newFragment);
-				}**/
-				if (i>0) {
-					DBListFragment aFragment = (DBListFragment) getSupportFragmentManager().
-							findFragmentByTag("android:switcher:"+R.id.pager+":"+Integer.toString(i));
-					if (aFragment != null) {
-						getSupportFragmentManager().beginTransaction().remove(aFragment).commit();
-						mSectionsPagerAdapter.notifyDataSetChanged();
-						if (aFragment.getView() != null) {
-							//aFragment.updateDisplay();
-
+					for (int i=0; i < tmpDBActive.length; i++) {
+						if ( mDBList.contains(tmpDBActive[i]) )
+						{
+							workingDBList.add(tmpDBActive[i]);
 						}
-						
+					}
+					if (workingDBList.size() == 0)
+					{
+						mDBActive = null;
+					} else {
+						mDBActive = workingDBList.toArray(new String[workingDBList.size()]);
 					}
 				}
-				else if (i==0) {
-					FavSectionFragment aFavFragment = (FavSectionFragment) getSupportFragmentManager().
-							findFragmentByTag("android:switcher:"+R.id.pager+":"+Integer.toString(i));
-					if (aFavFragment != null) {
-						//getSupportFragmentManager().beginTransaction().remove(aFavFragment).commit();
-						//mSectionsPagerAdapter.notifyDataSetChanged();
-						//if (aFavFragment.getView() != null) {
-							//aFavFragment.updateDisplay();
-
-						//}
-						aFavFragment.updatePositions();
-						
-					}
-				}
-	
-			}
-		}
+				
+				mSectionsPagerAdapter.notifyDataSetChanged();
+				
+				//totally kill the viewPager and all, and recreate!
+				//mSectionsPagerAdapter = null;
+				//getFragmentManager().beginTransaction().replace(containerViewId, fragment);
+				//and create the appropriate tabs
+				final ActionBar actionBar = getActionBar();
 		
-		//restart location manager
-		//mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-		mLocationHelper.refresh(locationListener);
+				/**mSectionsPagerAdapter = new SectionsPagerAdapter(
+						getSupportFragmentManager());
+
+				// Set up the ViewPager with the sections adapter.
+				mViewPager = (ViewPager) findViewById(R.id.pager);
+				mViewPager.setAdapter(mSectionsPagerAdapter);
+
+				mViewPager
+						.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+							@Override
+							public void onPageSelected(int position) {
+								actionBar.setSelectedNavigationItem(position);
+							}
+						});**/
+				
+				actionBar.removeAllTabs();
+				for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
+					actionBar.addTab(actionBar.newTab()
+							.setText(mSectionsPagerAdapter.getPageTitle(i))
+							.setTabListener(this));
+					
+					//update the fragment contents
+					/**if (i > 0 ) {
+						Fragment newFragment = new DBListFragment();
+						Bundle args = new Bundle();
+						args.putString(DBListFragment.DATABASE, mDBActive[i-1]);
+						newFragment.setArguments(args);
+						
+						getFragmentManager().beginTransaction().replace(i, newFragment);
+					}**/
+					if (i>0) {
+						DBListFragment aFragment = (DBListFragment) getSupportFragmentManager().
+								findFragmentByTag("android:switcher:"+R.id.pager+":"+Integer.toString(i));
+						if (aFragment != null) {
+							getSupportFragmentManager().beginTransaction().remove(aFragment).commit();
+							mSectionsPagerAdapter.notifyDataSetChanged();
+							if (aFragment.getView() != null) {
+								//aFragment.updateDisplay();
+
+							}
+							
+						}
+					}
+					else if (i==0) {
+						FavSectionFragment aFavFragment = (FavSectionFragment) getSupportFragmentManager().
+								findFragmentByTag("android:switcher:"+R.id.pager+":"+Integer.toString(i));
+						if (aFavFragment != null) {
+							//getSupportFragmentManager().beginTransaction().remove(aFavFragment).commit();
+							//mSectionsPagerAdapter.notifyDataSetChanged();
+							//if (aFavFragment.getView() != null) {
+								//aFavFragment.updateDisplay();
+
+							//}
+							aFavFragment.updatePositions();
+							
+						}
+					}
+		
+				}
+			}
+		} finally {
+		
+			//restart location manager
+			//mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+			mLocationHelper.refresh(locationListener);
+		}
 		
 	}
 	
