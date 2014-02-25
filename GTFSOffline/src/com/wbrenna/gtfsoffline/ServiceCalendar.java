@@ -167,6 +167,10 @@ public class ServiceCalendar {
 			final String svsq = "select service_id from trips where trip_id = ?";
 			final String[] svsargs = { trip_id };
 			final Cursor svs = mDB.rawQuery(svsq, svsargs);
+			if (svs.getCount() < 1) {
+				Log.e(TAG, "Database error, probably corrupt.");
+				return null;
+			}
 			svs.moveToFirst();
 			service_id = svs.getString(0);
 			svs.close();
@@ -352,6 +356,7 @@ public class ServiceCalendar {
 						"join trips on routes.route_id = trips.route_id where trip_id = ?";
 				final String[] selectargs2 = new String[] { listdetails.get(i)[2] };
 				final Cursor csr2 = mDatabaseHelper.ReadableDB(mDBName, mDB).rawQuery(q2, selectargs2);
+				
 				csr2.moveToFirst();
 	// departuretime	runstoday	trip_id		route_short_name	trip_headsign		stop_id	
 	//	140300		1		34867		13			Route 13 Laurelwood	xxxx
@@ -432,6 +437,7 @@ public class ServiceCalendar {
 
 		//need to find route (shortname) and trip headsign in order to return a full string
 		//do another query!
+
 		boolean more = csr.moveToFirst();
 		while (more) {
 
@@ -466,6 +472,7 @@ public class ServiceCalendar {
 				//final String[] selectargs2 = new String[] { listdetails.get(i)[2], listdetails.get(i)[0] };
 				final String[] selectargs2 = new String[] { listdetails.get(i)[2] };
 				final Cursor csr2 = mDatabaseHelper.ReadableDB(mDBName, mDB).rawQuery(q2, selectargs2);
+
 				csr2.moveToFirst();
 				//this should have only one element (trip_id is unique!)
 				//the format of this:

@@ -94,7 +94,7 @@ do
 	    table=$(echo `basename $file` | sed -e 's/\..*//')
 	    columns="stop_sorted,$(cat $file | tr -d '\015' | head -n 1)"
 	    #tail -n +2 "$file" | sort -k6 -g -t, | cat -n -s | awk '{ $1 = $1","; print}' > $tmpfile
-	    tail -n +2 "stops.txt" | sort -k6 -g -t, | grep -n '^' - | sed -e 's/\([0-9]\):/\1,/g' > $tmpfile
+	    tail -n +2 "stops.txt" | sort -k6 -g -t, | grep -n '^' - | sed -e '/^$/d' | sed -e 's/,\ */,/g' | sed -e 's/\([0-9]\):/\1,/g' > $tmpfile
 	    (
 		echo "create table $table($columns);"
 		echo ".separator ,"
@@ -106,7 +106,7 @@ do
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
 	    #columns=$(head -1 $file)
 	    columns=$(cat $file | tr -d '\015' | head -n 1)
-	    tail -n +2 "stop_times.txt" | sed -e '/^\s*$/d' | sed -e 's/\,\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/\,\([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/://g' > $tmpfile
+	    tail -n +2 "stop_times.txt" | sed -e '/^$/d' | sed -e 's/,\ */,/g' | sed -e '/^\s*$/d' | sed -e 's/\,\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/\,\([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/://g' > $tmpfile
 
 	    #This nifty command will strip times between 24:00:00 and 48:00:00 down to 000000-235959. Unfortunately it's not exactly needed!
 	    #tail -n +2 "stop_times.txt" | sed -e 's/?\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/0\1\2\3/g' | sed -e 's/\(^.*\)\(2[4-9]\|[3-4][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/echo \1`echo  "$(echo \2 - 24|bc)"`:\3:\4/ge' | sed -e 's/\(^.*\)\(2[4-9]\|[3-4][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/echo \1`echo  "$(echo \2 - 24|bc)"`:\3:\4/ge' | sed -e 's/\,\([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/://g' > $tmpfile
@@ -132,7 +132,7 @@ do
 	    #columns=$(cat $file | tr -d '\015' | sed -e '1 s/^\xef\xbb\xbf//' | head -n 1)
 	    columns=$(cat $file | head -n 1 | tr -d '\015' | sed -e '1 s/^\xef\xbb\xbf//')
 	    #tail -n +2 "$file" | tr '\r' '\n' > $tmpfile
-	    tail -n +2 "$file" | tr -d '\015' > $tmpfile
+	    tail -n +2 "$file" | tr -d '\015' | sed -e '/^$/d' | sed -e 's/,\ */,/g' > $tmpfile
 	    (
 		echo "create table $table($columns);"
 		echo ".separator ,"
