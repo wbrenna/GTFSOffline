@@ -105,7 +105,7 @@ do
 	    #We need to strip the colons out of the time
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
 	    #columns=$(head -1 $file)
-	    columns=$(cat $file | tr -d '\015' | head -n 1)
+	    columns=$(cat $file | tr -d '\015' | head -n 1 | sed -e '1 s/^\xef\xbb\xbf//')
 	    tail -n +2 "stop_times.txt" | sed -e '/^$/d' | sed -e 's/,\ */,/g' | sed -e '/^\s*$/d' | sed -e 's/\,\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/\,\([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/://g' > $tmpfile
 
 	    #This nifty command will strip times between 24:00:00 and 48:00:00 down to 000000-235959. Unfortunately it's not exactly needed!
@@ -119,7 +119,7 @@ do
     calendar.txt)
 	    calendartest2=true
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
-	    columns=$(cat $file | tr -d '\015' | head -n 1)
+	    columns=$(cat $file | tr -d '\015' | head -n 1 | sed -e '1 s/^\xef\xbb\xbf//')
 	    tail -n +2 "$file" > $tmpfile
 	    (
 		echo "create table $table($columns);"
@@ -143,7 +143,7 @@ do
 	    calendartest=true
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
 	    #columns=$(head -1 $file)
-	    columns=$(cat $file | tr -d '\015' | head -n 1)
+	    columns=$(cat $file | tr -d '\015' | head -n 1 | sed -e '1 s/^\xef\xbb\xbf//')
 	    #cat $file | sed -e1d > $tmpfile
 	    tail -n +2 "$file" > $tmpfile
 	    (
