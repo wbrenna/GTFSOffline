@@ -202,10 +202,12 @@ public class LocationFragmentHelper {
 			
 			// Calculate the distance to each point in the array
 			final float[] results = new float[2];
+			
+			if(mLocation == null) {
+				return null;
+			}
 			for (final StopLocn s : mStops) {
-				if(mLocation == null) {
-					return null;
-				}
+
 				Location.distanceBetween(mLocation.getLatitude(), mLocation.getLongitude(), s.lat, s.lon, results);
 				s.dist = results[0];
 				s.bearing = results[1];
@@ -328,7 +330,7 @@ public class LocationFragmentHelper {
 			public void onClick(DialogInterface dialog, int id) {
 				switch (id) {
 				case DialogInterface.BUTTON_POSITIVE:
-					AddBusstopFavourite(stop_id, stop_name);
+					AddBusstopFavourite(stop_id, stop_name + "#" + myDBName);
 					break;
 				}
 				dialog.cancel();

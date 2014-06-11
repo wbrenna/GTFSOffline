@@ -108,6 +108,13 @@ public class DatabaseHelper {
 				Toast.makeText(mContext, "Database " + DB_NAME + " is expired.", 
 						Toast.LENGTH_LONG).show();
 				
+			} else if (isDBPremature(DB_NAME, test)) {
+				CloseDB(test);
+				test = null;
+				//do the toast
+				Toast.makeText(mContext, "Database " + DB_NAME + " schedule is not active yet.", 
+						Toast.LENGTH_LONG).show();
+				
 			} else {
 				CloseDB(test);
 				test = null;
@@ -189,6 +196,34 @@ public class DatabaseHelper {
 		
 		final String mDBQuery = "select * from calendar where end_date >= ?";
 		final String mDBQueryDate = "select * from calendar_dates where date >= ?";
+		final String[] selectargs = { date };
+		final Cursor exp1 = aDB.rawQuery(mDBQuery, selectargs);
+		if (!exp1.moveToFirst()) {
+			exp1.close();
+			final Cursor exp2 = aDB.rawQuery(mDBQueryDate, selectargs);
+			if (exp2.moveToFirst()) {
+				exp2.close();
+				return false;
+			}
+			exp2.close();
+			return true;
+		}
+		exp1.close();
+		
+		return false;
+	}
+	
+	/* We will check the calendar to make sure that the database isn't expired */
+	public boolean isDBPremature(String aDBName, SQLiteDatabase aDB) {
+		
+		// ** ensure we check both calendar and calendar_dates for trips within this date range. sometimes databases only use one of the two. 
+		final Time t = new Time();
+		t.setToNow();
+		final String date = String.format("%04d%02d%02d", t.year, 
+				t.month+1, t.monthDay);
+		
+		final String mDBQuery = "select * from calendar where end_date <= ?";
+		final String mDBQueryDate = "select * from calendar_dates where date <= ?";
 		final String[] selectargs = { date };
 		final Cursor exp1 = aDB.rawQuery(mDBQuery, selectargs);
 		if (!exp1.moveToFirst()) {

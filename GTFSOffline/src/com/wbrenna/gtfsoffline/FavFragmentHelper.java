@@ -147,25 +147,55 @@ public class FavFragmentHelper {
 				Log.v(TAG, "Empty favourites");
 				return null;
 			}
-			for (int i = 0; i<tmpStops.size(); i++) {
-				//Log.e(TAG, "Stops are: " + Arrays.toString(tmpStops.get(i)));
-				mStops[i] = new StopLocn();
-				mStops[i].stop_id = tmpStops.get(i)[0];
-				mStops[i].stop_name = tmpStops.get(i)[1];
-			}
+			final TextUtils.SimpleStringSplitter splitter = new TextUtils.SimpleStringSplitter('#');
 			
 			Time t = new Time();
 			t.setToNow();
-			
+			if(mActiveDB == null)
+			{
+				return null;
+			}
 			for (String myDBName : mActiveDB) {
 				//Log.e(TAG, "Running on database: " + myDBName);
+
+				int stopsCounter = 0;
+				for (int i = 0; i<tmpStops.size(); i++) {
+					//Log.e(TAG, "Stops are: " + Arrays.toString(tmpStops.get(i)));
+
+					splitter.setString(tmpStops.get(i)[1]);
+					if(splitter.hasNext())
+					{
+						String tmpSplitterString = splitter.next();
+						if(splitter.hasNext())
+						{
+							//if DB string doesn't match, leave!
+							String tmpDbNameSplitter = splitter.next();
+							if(!tmpDbNameSplitter.equals(myDBName))
+							{
+								continue;
+							}
+						}
+						//if there is no DB string leave in for compatibility
+						mStops[i] = new StopLocn();
+						mStops[i].stop_id = tmpStops.get(i)[0];
+						mStops[i].stop_name = tmpSplitterString;
+						stopsCounter++;
+					}
+					//mStops[i].stop_name = tmpStops.get(i)[1];
+				}
+				if(stopsCounter == 0)
+				{
+					continue;
+				}
+				
 				myDB = mDatabaseHelper.ReadableDB(myDBName, null);
 				curDB = myDBName;
-				String[] mStopIdArray = new String[mStops.length];
+				//String[] mStopIdArray = new String[mStops.length];
+				String[] mStopIdArray = new String[stopsCounter];
 				
-				for (int i = 0; i < mStops.length; i++) {
+				for (int i = 0; i < stopsCounter; i++) {
 					mStopIdArray[i] = mStops[i].stop_id;
-					//Log.e(TAG, "Running on stop: " + s.stop_id);
+					//Log.w(TAG, "Running on stop: " + s.stop_id);
 				}
 				
 				//Now, we need to query to find the next NUM_BUSES.
