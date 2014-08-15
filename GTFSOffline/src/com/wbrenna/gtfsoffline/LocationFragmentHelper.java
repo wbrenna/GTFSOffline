@@ -270,7 +270,14 @@ public class LocationFragmentHelper {
 					fullResults = fullResultsA;
 				}
 				else {
-					fullResults.addAll(fullResultsA);
+                    if (t.hour <= 8) {
+                        fullResults.addAll(fullResultsA);
+                    }
+                    else {
+                        ArrayList<String[]> tmpResults = fullResultsA;
+                        tmpResults.addAll(fullResults);
+                        fullResults = tmpResults;
+                    }
 				}
 				
 				for (String[] str: fullResults) {
