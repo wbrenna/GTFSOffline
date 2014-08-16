@@ -176,9 +176,9 @@ public class FavFragmentHelper {
 							}
 						}
 						//if there is no DB string leave in for compatibility
-						mStops[i] = new StopLocn();
-						mStops[i].stop_id = tmpStops.get(i)[0];
-						mStops[i].stop_name = tmpSplitterString;
+						mStops[stopsCounter] = new StopLocn();
+						mStops[stopsCounter].stop_id = tmpStops.get(i)[0];
+						mStops[stopsCounter].stop_name = tmpSplitterString;
 						stopsCounter++;
 					}
 					//mStops[i].stop_name = tmpStops.get(i)[1];
