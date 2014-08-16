@@ -83,7 +83,7 @@ public class ServiceCalendar {
 	// Return string showing days this bus runs.
 	// Cursor points to a row in the calendar table for this service_id.
 	private static String getDays(Cursor csr) {
-		String days = new String();
+		String days = "";
 
 		for (int i = 0; i < 7; i++) {
 			if (csr.getInt(csr.getColumnIndex(mWeekDays[i])) == 1) {
@@ -157,10 +157,10 @@ public class ServiceCalendar {
 	// run on the given date. Limit to correct days of week, or not.
 	public String getTripDaysofWeek(String trip_id, String date, boolean limittotoday) {
 
-		String retstr = null;
+		String retstr;
 
 		// Get and translate the service id
-		String service_id = null;
+		String service_id;
 		if (trip2servicemap.containsKey(trip_id)) {
 			service_id = trip2servicemap.get(trip_id);
 		} else {
@@ -202,7 +202,7 @@ public class ServiceCalendar {
 		retstr = process_db(service_id, date, limittotoday, csr);
 		csr.close();
 
-		//sometimes calendar_dates contains the trip and not calendar.
+		//sometimes calendar_dates contains the trip and not calendar. = 0
 		//We therefore must also process here if retstr is null:
 		if (retstr == null) {
 			// Check for exceptions
@@ -688,7 +688,7 @@ public class ServiceCalendar {
 
 		while(inthours >= 24)
 		{
-			inthours = inthours - 24;
+			inthours -= 24;
 		}
 
 		try {
@@ -708,7 +708,7 @@ public class ServiceCalendar {
 
 		if (inthours > 12)
 		{
-			inthours = inthours - 12;
+			inthours -= 12;
 			try {
 				newtime =  Integer.toString(inthours) + ":" + minutes + seconds + PM;
 			} catch (final Error e) {
@@ -747,11 +747,11 @@ public class ServiceCalendar {
 		int hourdiff = Integer.parseInt(hours)-t.hour;
 
 		while (hourdiff >= 24) {
-			hourdiff = hourdiff - 24;
+			hourdiff -= 24;
 		}
 		
 		if(hourdiff < 0) {
-			hourdiff = hourdiff + 24;
+			hourdiff += 24;
 		}
 		
 		int minutesdiff = Integer.parseInt(minutes)-t.minute;

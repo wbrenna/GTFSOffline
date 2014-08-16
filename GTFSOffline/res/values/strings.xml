@@ -30,8 +30,8 @@
 
     <string name="about">About</string>
     <string name="ampmtimes">Show times as am/pm</string>
-    <string name="app_description"></string>
-    <string name="app_credits">Version: %1$s (internal %2$d), DB %3$d\n\nAuthor: Giles Malet\ngdmalet+GRTransit@gmail.com</string>
+    <string name="app_description">An Offline Bus and Rail App</string>
+    <string name="app_credits">Version: %1$s (internal %2$d), DB %3$d\n\nAuthor: Wilson Brenna\nwbrenna36@gmail.com</string>
     <string name="app_short_name">GTFSOffline</string>
     <string name="auto_check4dbupdate">Check online for schedule updates</string>
     <string name="button_routes">Routes</string>

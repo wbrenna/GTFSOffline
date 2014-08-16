@@ -93,7 +93,10 @@ public class MainActivity extends FragmentActivity implements
 
 		// Set up the action bar.
 		final ActionBar actionBar = getActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        if(actionBar != null) {
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        }
+
 
 		mProgress = (ProgressBar) findViewById(R.id.progress);
 		
@@ -173,7 +176,7 @@ public class MainActivity extends FragmentActivity implements
 			}
 		};
 		
-		//eventually add automated downloading of databases...
+		//TODO: eventually add automated downloading of databases...
 		
 		
 		// Create the adapter that will return a fragment for each of the
@@ -222,10 +225,7 @@ public class MainActivity extends FragmentActivity implements
 				//this is the list of currently checked databases
 				mDBActive = null;
 				//just to nullify the previous one.
-				if (initial_preferences.size() == 0) {
-					//mDBActive = null;
-					//already null
-				} else {
+				if (initial_preferences.size() != 0) {
 					String[] tmpDBActive = initial_preferences.toArray(new String[initial_preferences.size()]);
 					dbHelper.gatherFiles();
 					mDBList = dbHelper.GetListofDB();
@@ -267,8 +267,9 @@ public class MainActivity extends FragmentActivity implements
 								actionBar.setSelectedNavigationItem(position);
 							}
 						});**/
-				
-				actionBar.removeAllTabs();
+				if(actionBar != null) {
+                    actionBar.removeAllTabs();
+                }
 				for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
 					actionBar.addTab(actionBar.newTab()
 							.setText(mSectionsPagerAdapter.getPageTitle(i))
@@ -289,10 +290,9 @@ public class MainActivity extends FragmentActivity implements
 						if (aFragment != null) {
 							getSupportFragmentManager().beginTransaction().remove(aFragment).commit();
 							mSectionsPagerAdapter.notifyDataSetChanged();
-							if (aFragment.getView() != null) {
+							//if (aFragment.getView() != null) {
 								//aFragment.updateDisplay();
-
-							}
+							//}
 							
 						}
 					}

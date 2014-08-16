@@ -225,7 +225,7 @@ public class LocationFragmentHelper {
 			// Bearing is from -180 to +180, so use as index into here
 			mListDetails.clear();
 			final String[] DIRS = { "S", "SW", "W", "NW", "N", "NE", "E", "SE", };
-			Integer stop_limit = 0;
+			Integer stop_limit;
 			if (mStops.length < NUM_CLOSEST_STOPS) {
 				stop_limit = mStops.length;
 			} else {
@@ -310,9 +310,7 @@ public class LocationFragmentHelper {
 			//mListDetail.startAnimation(mSlideOut);
 
 			//mTitle.setText(R.string.title_activity_closest_stops);
-			if(mAdapter == null) {
-				// do nothing
-			} else {
+			if(mAdapter != null) {
 				mAdapter.notifyDataSetChanged();
 			}
 			//close the database
@@ -385,12 +383,10 @@ public class LocationFragmentHelper {
 
 		if (already) {
 			Toast.makeText(mContext, "Stop " + busstop + " is already a favourite!", Toast.LENGTH_LONG).show();
-			;
 		} else {
 			favs += busstop + ";";
 			mPrefs.edit().putString(FAVSTOPS_KEY, favs).putString(FAVSTOPS_KEY + "-" + busstop, stopname).commit();
 			Toast.makeText(mContext, "Stop " + busstop + " was added to your favourites.", Toast.LENGTH_LONG).show();
-			;
 		}
 	}
 	

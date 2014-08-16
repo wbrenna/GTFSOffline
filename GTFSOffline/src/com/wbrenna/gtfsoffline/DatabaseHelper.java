@@ -103,21 +103,18 @@ public class DatabaseHelper {
 			}
 			if(isDBExpired(DB_NAME, test)) {
 				CloseDB(test);
-				test = null;
 				//do the toast
 				Toast.makeText(mContext, "Database " + DB_NAME + " is expired.", 
 						Toast.LENGTH_LONG).show();
 				
 			} else if (isDBPremature(DB_NAME, test)) {
 				CloseDB(test);
-				test = null;
 				//do the toast
 				Toast.makeText(mContext, "Database " + DB_NAME + " schedule is not active yet.", 
 						Toast.LENGTH_LONG).show();
 				
 			} else {
 				CloseDB(test);
-				test = null;
 				DB_NAMES.add(DB_NAME);
 			}
 		
@@ -176,8 +173,12 @@ public class DatabaseHelper {
 	/* Return version of current DB */
 	public int GetDBVersion(String DB_NAME, SQLiteDatabase DB) {
 		if (DB == null) {
-			ReadableDB(DB_NAME, DB);
+			DB = ReadableDB(DB_NAME, DB);
 		}
+        if (DB == null) {
+            //error reading the database
+            return -1;
+        }
 		int dQuery = DB.rawQuery("PRAGMA user_version", null).getInt(0);
 
 		CloseDB(DB);

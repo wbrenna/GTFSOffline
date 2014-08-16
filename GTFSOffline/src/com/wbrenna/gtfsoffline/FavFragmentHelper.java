@@ -262,9 +262,7 @@ public class FavFragmentHelper {
 			//mListDetail.startAnimation(mSlideOut);
 
 			//mTitle.setText(R.string.title_activity_closest_stops);
-			if(mAdapter == null) {
-				// do nothing
-			} else {
+			if(mAdapter != null) {
 				mAdapter.notifyDataSetChanged();
 			}
 		}

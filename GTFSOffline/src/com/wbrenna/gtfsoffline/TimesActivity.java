@@ -86,7 +86,11 @@ public class TimesActivity extends ListActivity {
 
 		DBHelper = new DatabaseHelper(this);
 		
-		getActionBar().setTitle(R.string.routestitle);
+		try {
+            getActionBar().setTitle(R.string.routestitle);
+        } catch (NullPointerException n) {
+            Log.e(TAG, "Null pointer exception getting Routes List.");
+        }
 
 	}
 
