@@ -50,8 +50,8 @@ public class timestopdescArrayAdapter extends ArrayAdapter <String[]> /*<ArrayLi
 
 	static class ViewHolder {
 		TextView stoptime; //this is the distance to the stop (not labeled well!)
-		TextView label;	//this is stop_id
-		TextView value; // this is stop_name
+		TextView label;	//this is stop_id - now changed to Short Route Name
+		TextView value; // this is stop_name + stop_id
 		TextView tripheader; //this is the trip header
 		TextView departsin; //the time until it departs
 		TextView tripid; //a hidden trip id
@@ -86,11 +86,12 @@ public class timestopdescArrayAdapter extends ArrayAdapter <String[]> /*<ArrayLi
 		}
 
 		if (mDetails.size() >= position) {
-			if (mDetails.get(position).length > 6)
+			if (mDetails.get(position).length > 7)
 			{
 				holder.stoptime.setText(mDetails.get(position)[0]);
-				holder.label.setText(mDetails.get(position)[1]);
-				holder.value.setText(mDetails.get(position)[2]);
+				holder.label.setText(mDetails.get(position)[7]);
+                //add the stop ID to the stop name
+				holder.value.setText(mDetails.get(position)[2] + " - " + mDetails.get(position)[1]);
 				holder.tripheader.setText(mDetails.get(position)[3]);
 				holder.departsin.setText(mDetails.get(position)[4]);
 				holder.tripid.setText(mDetails.get(position)[5]);

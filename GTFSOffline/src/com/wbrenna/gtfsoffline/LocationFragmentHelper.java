@@ -49,6 +49,7 @@ public class LocationFragmentHelper {
 	private static int grid_size;
 	private static int NUM_CLOSEST_STOPS;
 	private static int NUM_BUSES;	//the number of next buses per stop to be shown.
+    private boolean USE_ROUTE_NO;
 
 	private Location mLocation;
 	private timestopdescArrayAdapter mAdapter;
@@ -112,6 +113,7 @@ public class LocationFragmentHelper {
 					mContext.getString(R.string.pref_hours_look_ahead), "1"));
 		grid_size = Integer.parseInt(mPrefs.getString(
 				mContext.getString(R.string.pref_grid_size_key), "1"));
+        USE_ROUTE_NO = mPrefs.getBoolean("useroutenos", false);
 	}
 
 	public ArrayList<String[]> retrieveNextBusList() {
@@ -270,7 +272,7 @@ public class LocationFragmentHelper {
 					fullResults = fullResultsA;
 				}
 				else {
-                    if (t.hour <= 8) {
+                    if (t.hour <= hoursLookAhead) {
                         fullResults.addAll(fullResultsA);
                     }
                     else {
@@ -285,10 +287,17 @@ public class LocationFragmentHelper {
 					final String hours = str[0].substring(0,2);
 					final String minutes = str[0].substring(2,4);
 					//String departsIn;
+                    final String routeNo;
+                    if (str[3].equals("") || (!USE_ROUTE_NO)) {
+                        routeNo = s.stop_id;
+                    }
+                    else {
+                        routeNo = str[3];
+                    }
 
 					mListDetails.add(new String[] { dist, s.stop_id, s.stop_name, 
 							str[4], myBusService.formattedDepartureTime(t, hours, minutes),
-							str[2], myDBName});
+							str[2], myDBName, routeNo});
 					
 				}
 				publishProgress(((int) ((i / (float) stop_limit) * 100)));

@@ -419,30 +419,6 @@ public class MainActivity extends FragmentActivity implements
 
 		@Override
 		public int getItemPosition(Object object) {
-			//this is called on notifyDataSetChanged, which we use on tab swipe
-			//Fragment f = (Fragment) object;
-		//	if (f instanceof DBListFragment) {
-				//((DBListFragment) f).updatePositions();
-				//Log.e(TAG,"Updating positions");
-		//	}
-			/**
-			Fragment f = (Fragment) object;
-			if (f instanceof DBListFragment) {
-				if (super.getItemPosition(f) == mViewPager.getCurrentItem()) {
-					((DBListFragment) f).relinkPosition();
-					Log.e(TAG, "Relinking from Main");
-				}
-				else {
-					((DBListFragment) f).unlinkPosition();
-					Log.e(TAG, "Unlinking from Main");
-				}
-					
-			}
-			**/
-			
-			//Instead let's just force a view refresh
-			//return super.getItemPosition(object);
-			//Log.e(TAG,"Updating positions");
 			return POSITION_NONE;
 		}
 		

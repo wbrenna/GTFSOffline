@@ -47,7 +47,7 @@ public class ServiceCalendar {
 
 	
 	//Since we are less than or equal to 8 hours search length:
-	private final int HOURTOGGLE = 8;
+	//private final int HOURTOGGLE = 8;
 	
 	// Match day number to a string and an abbreviation
 	private static final String[] mWeekDays = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
@@ -260,7 +260,7 @@ public class ServiceCalendar {
 		//Log.w(TAG,"Stopstring is " + stopsString);
 		
 		//look for routes from last night
-		if ( (t.hour <= HOURTOGGLE) && (!earlyMorning) ) {
+		if ( (t.hour <= hoursLookAhead) && (!earlyMorning) ) {
 			timenow = String.format("%02d%02d%02d", t.hour+24, t.minute+1, t.second);
 			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead+24,t.minute,t.second);
 			q = "select distinct trip_id,departure_time,stop_id from stop_times where stop_id in " 
@@ -390,7 +390,7 @@ public class ServiceCalendar {
 		String date;
 
 		//look for routes from last night
-		if ( (t.hour <= HOURTOGGLE) && (!earlyMorning) ) {
+		if ( (t.hour <= hoursLookAhead) && (!earlyMorning) ) {
 			timenow = String.format("%02d%02d%02d", t.hour+24, t.minute+1, t.second);
 			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead+24,t.minute,t.second);
 			q = "select distinct trip_id,departure_time,stop_id from stop_times where stop_id = ?" 
@@ -511,7 +511,7 @@ public class ServiceCalendar {
 		String date;
 
 		//look for routes from last night
-		if ( (t.hour <= HOURTOGGLE) && (!earlyMorning) ) {
+		if ( (t.hour <= hoursLookAhead) && (!earlyMorning) ) {
 			timenow = String.format("%02d%02d%02d", t.hour+24, t.minute+1, t.second);
 			timelimit = String.format("%02d%02d%02d", t.hour+hoursLookAhead+24,t.minute,t.second);
 			q = "select trip_id,departure_time from stop_times where stop_id = ? and departure_time >= ? and departure_time <= ?"
