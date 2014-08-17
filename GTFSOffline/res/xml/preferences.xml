@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <MultiSelectListPreference
+        android:key="@string/pref_dbs"
+        android:title="@string/use_dbs"
+        android:summary="Activate databases (one tab each)."
+        android:defaultValue="@array/empty_array" />
     
     <CheckBoxPreference
         android:defaultValue="false"
@@ -9,7 +15,10 @@
         android:defaultValue="false"
         android:key="@string/pref_ampmtimes_key"
         android:title="@string/ampmtimes" />
-    
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_useroutes_key"
+        android:title="@string/useroutes" />
     
     <ListPreference
         android:defaultValue="@string/default_hours_look_ahead"
@@ -41,11 +50,6 @@
         android:summary="Only look for bus stops within this range."
         android:title="@string/grid_size" />
     
-    
-    <MultiSelectListPreference
-        android:key="@string/pref_dbs"
-        android:title="@string/use_dbs"
-        android:summary="Activate databases (one tab each)."
-        android:defaultValue="@array/empty_array" />
+
 
 </PreferenceScreen>

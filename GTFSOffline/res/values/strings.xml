@@ -73,6 +73,7 @@
     <string name="pref_ampmtimes_key">ampmtimes</string>
     <string name="pref_db_autoupdate_key">autodbupdate</string>
     <string name="pref_favstops_key">favstops</string>
+    <string name="pref_useroutes_key">useroutenos</string>
     <string name="pref_showallbusses_key">showallbusses</string>
     <string name="pref_uuid_key">uuid</string>
     <string name="refresh">Refresh</string>
@@ -89,6 +90,7 @@
     <string name="title_mapstops">Transit Stops</string>
     <string name="title_rider_alerts">Rider Alerts</string>
     <string name="title_search">Search bus stops or routes</string>
+    <string name="useroutes">Flag route numbers, not stops</string>
 	<string name="yes">Yes</string>
     
 </resources>
