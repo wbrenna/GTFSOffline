@@ -347,7 +347,15 @@ public class ServiceCalendar {
 		{
 			Collections.sort(listdetails, new Comparator <String[]>() {
 				public int compare(String[] a, String[] b) {
-					return (a[0].compareTo(b[0]));
+					int v1 = Integer.parseInt(a[0])-Integer.parseInt(timenow);
+					int v2 = Integer.parseInt(b[0])-Integer.parseInt(timenow);
+					if (v1 < 0) {
+						v1 = v1 + 24;
+					}
+					if (v2 < 0) {
+						v2 = v2 + 24;
+					}
+					return v1-v2;
 				}
 			});
 			for (int i = 0; i < Math.min(maxResultsPerStop*nStopsInDB,listdetails.size()); i++ ) {
@@ -462,7 +470,15 @@ public class ServiceCalendar {
 			
 			Collections.sort(listdetails, new Comparator <String[]>() {
 				public int compare(String[] a, String[] b) {
-					return (a[0].compareTo(b[0]));
+					int v1 = Integer.parseInt(a[0])-Integer.parseInt(timenow);
+					int v2 = Integer.parseInt(b[0])-Integer.parseInt(timenow);
+					if (v1 < 0) {
+						v1 = v1 + 24;
+					}
+					if (v2 < 0) {
+						v2 = v2 + 24;
+					}
+					return v1-v2;
 				}
 			});
 			for (int i = 0; i < Math.min(maxResults,listdetails.size()); i++ ) {

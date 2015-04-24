@@ -6,7 +6,7 @@
         android:title="@string/use_dbs"
         android:summary="Activate databases (one tab each)."
         android:defaultValue="@array/empty_array" />
-    
+
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="@string/pref_showallbusses_key"
