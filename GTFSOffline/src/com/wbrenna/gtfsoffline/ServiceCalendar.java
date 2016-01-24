@@ -370,7 +370,7 @@ public class ServiceCalendar {
 	//	140300		1		34867		13			Route 13 Laurelwood	xxxx
 				if (csr2.getString(2).equals(""))
 				{
-					results.add(new String[] { listdetails.get(i)[0], listdetails.get(i)[1], listdetails.get(i)[2], csr2.getString(0), csr2.getString(2), listdetails.get(i)[3] });
+					results.add(new String[] { listdetails.get(i)[0], listdetails.get(i)[1], listdetails.get(i)[2], csr2.getString(1), csr2.getString(0), listdetails.get(i)[3] });
 				} else {
 					results.add(new String[] { listdetails.get(i)[0], listdetails.get(i)[1], listdetails.get(i)[2], csr2.getString(1), csr2.getString(2), listdetails.get(i)[3] });
 				}
@@ -498,7 +498,7 @@ public class ServiceCalendar {
 				//Some routes use only long_name, some use short_name. Also trip_headsign doesn't always exist.
 				if (csr2.getString(2).equals(""))
 				{
-					results.add(new String[] { listdetails.get(i)[0], listdetails.get(i)[1], listdetails.get(i)[2], csr2.getString(0), csr2.getString(2) });
+					results.add(new String[] { listdetails.get(i)[0], listdetails.get(i)[1], listdetails.get(i)[2], csr2.getString(1), csr2.getString(0) });
 				} else {
 					results.add(new String[] { listdetails.get(i)[0], listdetails.get(i)[1], listdetails.get(i)[2], csr2.getString(1), csr2.getString(2) });
 				}
