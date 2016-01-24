@@ -130,6 +130,11 @@ public class UpdateActivity extends Activity {
 			//int DBtotal = 0;
 			//Toast.makeText(mContext, "Copying, please wait.", Toast.LENGTH_LONG).show();
 			
+			//Fix a null pointer exception if downloadStrings is empty.
+			if(downloadStrings == null) {
+				Log.e(TAG, "No files returned by downloadFolder.listFiles");
+				return null;
+			}
 			
 			for(File theFile : downloadStrings ) {
 				try {
