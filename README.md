@@ -5,8 +5,9 @@ Description
 -------------------------
 
 GTFSOffline is a transit app for Android >= 4.0,
-forked from <a href="http://github.com/gdmalet/grtransit">GRTransit</a>,
-an excellent transit app for the Grand River Transit bus system.
+originally forked from <a href="http://github.com/gdmalet/grtransit">GRTransit</a>
+and substantially modified (supporting multiple transit agencies, with stripped-down
+privacy centric features).
 
 Because of the standardization of the GTFS feed format, many transit
 initiatives across the country are releasing open routes in GTFS format.
