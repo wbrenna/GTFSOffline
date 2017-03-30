@@ -6,7 +6,7 @@
 
 MYNAME=$(basename $0)
 #SQ3=/usr/local/android-sdk-linux/tools/sqlite3
-SQ3=/opt/adt-bundle-linux-x86_64-20131030/sdk/tools/sqlite3
+SQ3=/usr/bin/sqlite3
 
 function usage {
     echo "Usage: $MYNAME dbname file [file ...]"
