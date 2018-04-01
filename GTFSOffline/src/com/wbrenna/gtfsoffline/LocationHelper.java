@@ -65,14 +65,14 @@ public class LocationHelper {
 		Location nwlocn = null, gpslocn = null;
 		if (gpsOn) {
 			try {
-				nwlocn = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+				gpslocn = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			} catch (final IllegalArgumentException e) {
 				Log.e(TAG, "Exception requesting last location from GPS_PROVIDER");
 			}
 		}
 		if (netOn) {
 			try {
-				gpslocn = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+				nwlocn = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 			} catch (final IllegalArgumentException e) {
 				Log.e(TAG, "Exception requesting last location from NETWORK_PROVIDER");
 			}
