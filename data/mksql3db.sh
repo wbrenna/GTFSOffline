@@ -94,7 +94,7 @@ do
 	    table=$(echo `basename $file` | sed -e 's/\..*//')
 	    columns="stop_sorted,$(cat $file | tr -d '\015' | head -n 1 | sed -e '1 s/^\xef\xbb\xbf//')"
 	    #tail -n +2 "$file" | sort -k6 -g -t, | cat -n -s | awk '{ $1 = $1","; print}' > $tmpfile
-	    tail -n +2 $file | sort -k6 -g -t, | grep -n '^' - | sed -e '/^$/d' | sed -e 's/,\ */,/g' | sed -e 's/\([0-9]\):/\1,/g' > $tmpfile
+	    tail -n +2 $file | awk '{$1=$1};1' | sort -k6 -g -t, | grep -n '^' - | sed -e '/^$/d' | sed -e 's/,\ */,/g' | sed -e 's/\([0-9]\):/\1,/g' > $tmpfile
 	    (
 		echo "create table $table($columns);"
 		echo ".separator ,"
@@ -106,7 +106,7 @@ do
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
 	    #columns=$(head -1 $file)
 	    columns=$(cat $file | tr -d '\015' | head -n 1 | sed -e '1 s/^\xef\xbb\xbf//')
-	    tail -n +2 $file | sed -e '/^$/d' | sed -e 's/,\ */,/g' | sed -e '/^\s*$/d' | sed -e 's/\,\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/\,\([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/://g' > $tmpfile
+	    tail -n +2 $file | awk '{$1=$1};1' | sed -e '/^$/d' | sed -e 's/,\ */,/g' | sed -e '/^\s*$/d' | sed -e 's/\,\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/\,\([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/://g' > $tmpfile
 
 	    #This nifty command will strip times between 24:00:00 and 48:00:00 down to 000000-235959. Unfortunately it's not exactly needed!
 	    #tail -n +2 "stop_times.txt" | sed -e 's/?\ \([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/0\1\2\3/g' | sed -e 's/\(^.*\)\(2[4-9]\|[3-4][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/echo \1`echo  "$(echo \2 - 24|bc)"`:\3:\4/ge' | sed -e 's/\(^.*\)\(2[4-9]\|[3-4][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/echo \1`echo  "$(echo \2 - 24|bc)"`:\3:\4/ge' | sed -e 's/\,\([0-9]\):\([0-9][0-9]\):\([0-9][0-9]\)/\,0\1\2\3/g' | sed -e 's/://g' > $tmpfile
@@ -120,7 +120,7 @@ do
 	    calendartest2=true
 	    table=$(echo `basename $1` | sed -e 's/\..*//')
 	    columns=$(cat $file | tr -d '\015' | head -n 1 | sed -e '1 s/^\xef\xbb\xbf//')
-	    tail -n +2 "$file" > $tmpfile
+	    tail -n +2 "$file" | awk '{$1=$1};1' > $tmpfile
 	    (
 		echo "create table $table($columns);"
 		echo ".separator ,"
@@ -132,7 +132,7 @@ do
 	    #columns=$(cat $file | tr -d '\015' | sed -e '1 s/^\xef\xbb\xbf//' | head -n 1)
 	    columns=$(cat $file | head -n 1 | tr -d '\015' | sed -e '1 s/^\xef\xbb\xbf//')
 	    #tail -n +2 "$file" | tr '\r' '\n' > $tmpfile
-	    tail -n +2 "$file" | tr -d '\015' | sed -e '/^$/d' | sed -e 's/,\ */,/g' > $tmpfile
+	    tail -n +2 "$file" | awk '{$1=$1};1' | tr -d '\015' | sed -e '/^$/d' | sed -e 's/,\ */,/g' > $tmpfile
 	    (
 		echo "create table $table($columns);"
 		echo ".separator ,"
@@ -145,7 +145,7 @@ do
 	    #columns=$(head -1 $file)
 	    columns=$(cat $file | tr -d '\015' | head -n 1 | sed -e '1 s/^\xef\xbb\xbf//')
 	    #cat $file | sed -e1d > $tmpfile
-	    tail -n +2 "$file" > $tmpfile
+	    tail -n +2 "$file" | awk '{$1=$1};1' > $tmpfile
 	    (
 		echo "create table $table($columns);"
 		echo ".separator ,"
@@ -194,7 +194,6 @@ $SQ3 $DB.new <<-EOT
   create index calendar_dates_date on calendar_dates ( date );
   create index calendar_service_id on calendar ( service_id );
   PRAGMA user_version = $version;
-  vacuum;
 EOT
 ###	Indexes used:
 ###		service_ids on calendar (for each service_id check whether our condition matches it)
@@ -208,9 +207,34 @@ EOT
 ###		stop_id on stops.txt (to get stop_name)
 
 ###	****departure_time is now hhmmss, with NO COLONS - this enables sorting
+echo "Indices created."
 
+echo "Adding head signs if not already in DB..."
+tbcols=$($SQ3 $DB.new 'select sql from sqlite_master where type="table" and tbl_name="trips";'|awk -F'[()]' '{print $2}')
+case "$tbcols" in
+  *trip_headsign*)
+        echo "Head signs already in DB"
+  ;;
+  *)
+	$SQ3 $DEBUG $DB.new <<-EOT
+	  alter table trips add column trip_headsign;
+	  insert into trips select $tbcols,trip_headsign from (select $tbcols,(select coalesce(stop_name,max(cast(stop_sequence as int))) stop_name from stop_times inner join stops where stop_times.trip_id=trips.trip_id and stop_times.stop_id=stops.stop_id) trip_headsign from trips);
+	  delete from trips where trip_headsign is NULL and rowid not in (select max(rowid) from trips group by route_id,service_id,trip_id);
+	EOT
+	echo "Adding head signs completed"
+  ;;
+esac
 
-echo "Indices created. Renaming and cleaning up..."
+echo "Deleting departure time of last stop of each trip..."
+tbcols=$($SQ3 $DB.new 'select sql from sqlite_master where type="table" and tbl_name="stop_times";'|awk -F'[()]' '{print $2}')
+(
+echo "insert into stop_times select $tbcols from (select $(echo "$tbcols"|sed "s/departure_time/NULL as departure_time/") from stop_times group by trip_id having max(cast(stop_sequence as int)));"
+echo 'delete from stop_times where departure_time is not NULL and arrival_time<>"" and rowid not in (select max(rowid) from stop_times group by trip_id,stop_sequence);'
+echo 'vacuum;'
+) | $SQ3 $DEBUG $DB.new
+echo "Deleting departure times completed"
+
+echo "Renaming and cleaning up..."
 mv $DB $DB.old
 mv $DB.new $DB
 mv $DB.version $DB.version.old
