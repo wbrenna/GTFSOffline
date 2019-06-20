@@ -93,8 +93,8 @@ do
     stops.txt)
 	    table=$(echo `basename $file` | sed -e 's/\..*//')
 	    columns="stop_sorted,$(cat $file | tr -d '\015' | head -n 1 | sed -e '1 s/^\xef\xbb\xbf//')"
-	    #tail -n +2 "$file" | sort -k6 -g -t, | cat -n -s | awk '{ $1 = $1","; print}' > $tmpfile
-	    tail -n +2 $file | awk '{$1=$1};1' | sort -k6 -g -t, | grep -n '^' - | sed -e '/^$/d' | sed -e 's/,\ */,/g' | sed -e 's/\([0-9]\):/\1,/g' > $tmpfile
+	    #tail -n +2 "$file" | sort -k6 -n -t, | cat -n -s | awk '{ $1 = $1","; print}' > $tmpfile
+	    tail -n +2 $file | awk '{$1=$1};1' | sort -k6 -n -t, | grep -n '^' - | sed -e '/^$/d' | sed -e 's/,\ */,/g' | sed -e 's/\([0-9]\):/\1,/g' > $tmpfile
 	    (
 		echo "create table $table($columns);"
 		echo ".separator ,"
@@ -242,7 +242,9 @@ mv $DB.version $DB.version.old
 gzip -9v -c $DB > $DB.gz
 
 md5=$(md5sum $DB | cut -f1 -d' ')
+#md5=$(md5 -q $DB)
 size=$(stat -c "%s" $DB.gz)
+#size=$(stat -f "%z" $DB.gz)
 sizem=$(echo "1k $size 512+ 1024/1024/p" | dc)
 echo "$version $sizem $md5" > $DB.version
 
