@@ -172,7 +172,8 @@ public class LocationFragmentHelper {
 				selectargs = new String[] { };
 			} else {
 				qry = "select stop_id as _id, stop_lat, stop_lon, stop_name from stops " +
-						"where stop_lat < ? and stop_lat > ? and stop_lon < ? and stop_lon > ?";
+						"where cast(stop_lat as real) < ? and cast(stop_lat as real) > ? and " +
+						"cast(stop_lon as real) < ? and cast(stop_lon as real) > ?";
 				selectargs = new String[] { Double.toString(myTop), Double.toString(myBottom), 
 					Double.toString(myLeft), Double.toString(myRight) };
 			}
